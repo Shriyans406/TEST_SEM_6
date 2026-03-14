@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
-    "eslint-config-google": "^0.14.0"
+    "eslint-config-google": "^0.14.0",
+    "puppeteer": "^24.39.1"
   }
 }

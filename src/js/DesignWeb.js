@@ -3,6 +3,7 @@ import React, { Component } from "react";
 
 // Use CDN for production
 import { Core } from "https://cdn.jsdelivr.net/gh/dubstar-04/Design-Core/core/core/core.js";
+import { Text } from "https://cdn.jsdelivr.net/gh/dubstar-04/Design-Core/core/entities/text.js";
 
 import Headerbar from "./components/headerbar.js";
 import Canvas from "./components/canvas.js";
@@ -14,6 +15,19 @@ import PopoverMenuItem from "./components/popoverMenuItem.js";
 import { saveAs } from "file-saver";
 import LayersWindow from "./components/layersWindow.js";
 
+// === MONKEY PATCH FIX ===
+// The TextMetrics object returned by ctx.measureText loses context when deep cloned,
+// throwing 'Illegal invocation' during 'm' (move) or other clone operations.
+// We patch Text.draw to convert it to a plain object.
+const originalTextDraw = Text.prototype.draw;
+Text.prototype.draw = function(ctx, scale) {
+  originalTextDraw.call(this, ctx, scale);
+  if (this.boundingRect && this.boundingRect.width !== undefined && this.boundingRect.constructor.name === "TextMetrics") {
+    this.boundingRect = { width: this.boundingRect.width, height: this.height };
+  }
+};
+// ========================
+
 export default class DesignWeb extends Component {
   constructor() {
     super();
@@ -22,6 +36,42 @@ export default class DesignWeb extends Component {
 
     this.popoverRef = React.createRef();
     this.layersWindowRef = React.createRef();
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  handleKeyDown(e) {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 'z') {
+        e.preventDefault();
+        this.undo();
+      } else if (e.key === 'y') {
+        e.preventDefault();
+        this.redo();
+      } else if (e.key === 'Z' && e.shiftKey) {
+        e.preventDefault();
+        this.redo();
+      }
+    }
+  }
+
+  undo() {
+    if (this.core && this.core.scene) {
+      this.core.scene.undo();
+    }
+  }
+
+  redo() {
+    if (this.core && this.core.scene) {
+      this.core.scene.redo();
+    }
   }
 
   updateMousePos(mousePos) {
@@ -123,7 +173,7 @@ export default class DesignWeb extends Component {
           />
         </Popover>
 
-        <Headerbar core={this.core} popover={this.popoverRef} />
+        <Headerbar core={this.core} popover={this.popoverRef} undo={this.undo.bind(this)} redo={this.redo.bind(this)} />
         <Canvas
           core={this.core}
           mousePosCallback={this.updateMousePos.bind(this)}
