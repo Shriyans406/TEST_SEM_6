@@ -84,6 +84,21 @@ export class Circle extends Entity {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(-1), mousePoint];
       DesignCore.Scene.tempEntities.create(this.type, { points: points });
+
+      // Add real-time text measurement
+      const lastPoint = this.points.at(-1);
+      const radius = lastPoint.distance(mousePoint);
+      const textPosition = lastPoint.midPoint(mousePoint);
+
+      const dimensionText = `R: ${radius.toFixed(2)}`;
+
+      DesignCore.Scene.tempEntities.create('Text', {
+        points: [textPosition],
+        string: dimensionText,
+        height: 12,
+        horizontalAlignment: 1, // center
+        verticalAlignment: 2,   // middle
+      });
     }
   }
 

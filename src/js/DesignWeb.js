@@ -2,8 +2,8 @@ import "../css/DesignWeb.css";
 import React, { Component } from "react";
 
 // Use CDN for production
-import { Core } from "https://cdn.jsdelivr.net/gh/dubstar-04/Design-Core/core/core/core.js";
-import { Text } from "https://cdn.jsdelivr.net/gh/dubstar-04/Design-Core/core/entities/text.js";
+import { Core } from "./Design-Core/core/core.js";
+import { Text } from "./Design-Core/entities/text.js";
 
 import Headerbar from "./components/headerbar.js";
 import Canvas from "./components/canvas.js";
@@ -173,7 +173,12 @@ export default class DesignWeb extends Component {
           />
         </Popover>
 
-        <Headerbar core={this.core} popover={this.popoverRef} undo={this.undo.bind(this)} redo={this.redo.bind(this)} />
+        <Headerbar
+          core={this.core}
+          popover={this.popoverRef}
+          redo={this.redo.bind(this)}
+          undo={this.undo.bind(this)}
+        />
         <Canvas
           core={this.core}
           mousePosCallback={this.updateMousePos.bind(this)}

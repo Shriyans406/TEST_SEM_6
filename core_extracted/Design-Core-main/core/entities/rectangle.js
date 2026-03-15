@@ -65,6 +65,22 @@ export class Rectangle extends Entity {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = this.rectPoints(this.points.at(-1), mousePoint);
       DesignCore.Scene.tempEntities.create('Polyline', { points: points });
+
+      // Add real-time text measurement
+      const lastPoint = this.points.at(-1);
+      const w = Math.abs(mousePoint.x - lastPoint.x);
+      const h = Math.abs(mousePoint.y - lastPoint.y);
+      const textPosition = new Point((mousePoint.x + lastPoint.x) / 2, (mousePoint.y + lastPoint.y) / 2);
+
+      const dimensionText = `W: ${w.toFixed(2)}, H: ${h.toFixed(2)}`;
+
+      DesignCore.Scene.tempEntities.create('Text', {
+        points: [textPosition],
+        string: dimensionText,
+        height: 12,
+        horizontalAlignment: 1, // center
+        verticalAlignment: 2,   // middle
+      });
     }
   }
 

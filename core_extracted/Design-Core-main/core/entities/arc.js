@@ -117,12 +117,42 @@ export class Arc extends Entity {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [this.points.at(0), mousePoint];
       DesignCore.Scene.tempEntities.create('Line', { points: points });
+
+      // Add real-time text measurement for radius
+      const centerPoint = this.points.at(0);
+      const dist = centerPoint.distance(mousePoint);
+      const textPosition = centerPoint.midPoint(mousePoint);
+      
+      const dimensionText = `R: ${dist.toFixed(2)}`;
+      
+      DesignCore.Scene.tempEntities.create('Text', {
+        points: [textPosition],
+        string: dimensionText,
+        height: 12,
+        horizontalAlignment: 1, // center
+        verticalAlignment: 2,   // middle
+      });
     }
 
     if (this.points.length >= 2) {
       const mousePoint = DesignCore.Mouse.pointOnScene();
       const points = [...this.points, mousePoint];
       DesignCore.Scene.tempEntities.create(this.type, { points: points });
+
+      // Add real-time text measurement for angle
+      const centerPoint = this.points.at(0);
+      let angle = Utils.radians2degrees(centerPoint.angle(mousePoint));
+      if (angle < 0) angle += 360;
+
+      const dimensionText = `Angle: ${angle.toFixed(1)}°`;
+
+      DesignCore.Scene.tempEntities.create('Text', {
+        points: [mousePoint],
+        string: dimensionText,
+        height: 12,
+        horizontalAlignment: 1, // center
+        verticalAlignment: 1,   // bottom (so it sits above the mouse cursor)
+      });
     }
   }
 
