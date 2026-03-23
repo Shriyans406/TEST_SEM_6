@@ -30,7 +30,7 @@ export default class Headerbar extends Component {
         <div className="headerbar-title">
           <h3>Design</h3>
         </div>
-        <div className="headerbar-actions" style={{display: 'flex', marginLeft: 'auto', gap: '8px', marginRight: '16px'}}>
+        <div className="headerbar-actions" style={{display: 'flex', marginLeft: 'auto', gap: '8px', marginRight: '48px'}}>
           <ToolbarButton
             command="Undo"
             icon={`${process.env.PUBLIC_URL}/icons/tools/undo-symbolic.svg`}
