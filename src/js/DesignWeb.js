@@ -14,6 +14,8 @@ import PopoverMenuItem from "./components/popoverMenuItem.js";
 
 import { saveAs } from "file-saver";
 import LayersWindow from "./components/layersWindow.js";
+import { GCodeEngine } from "./gcodeEngine.js";
+import { WebSerialStreamer } from "./webSerialStreamer.js";
 
 // === MONKEY PATCH FIX ===
 // The TextMetrics object returned by ctx.measureText loses context when deep cloned,
@@ -106,6 +108,30 @@ export default class DesignWeb extends Component {
       });
   }
 
+  async handlePlotToMachine() {
+    this.popoverRef.current.close();
+    console.log("Plotting to machine via Web Serial...");
+    
+    try {
+      // 1. Generate optimized G-code
+      const engine = new GCodeEngine(this.core, 150);
+      const gcodeObj = engine.generate();
+      
+      // 2. Connect and stream
+      if (!this.streamer) {
+        this.streamer = new WebSerialStreamer();
+      }
+      
+      const connected = await this.streamer.connect();
+      if (connected) {
+        await this.streamer.streamGcode(gcodeObj);
+      }
+    } catch (err) {
+      console.error("Plotting error:", err);
+      alert("Failed to plot: " + err.message);
+    }
+  }
+
   handleOpenFile(e) {
     this.popoverRef.current.close();
     const fileSelector = document.createElement("input");
@@ -161,6 +187,10 @@ export default class DesignWeb extends Component {
           <PopoverMenuItem
             action={this.handleConvertToSVG.bind(this)}
             title="Convert to SVG"
+          />
+          <PopoverMenuItem
+            action={this.handlePlotToMachine.bind(this)}
+            title="Plot to Machine"
           />
 
           <PopoverMenuItem
