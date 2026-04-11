@@ -114,7 +114,7 @@ export default class DesignWeb extends Component {
     
     try {
       // 1. Generate optimized G-code
-      const engine = new GCodeEngine(this.core, 150);
+      const engine = new GCodeEngine(this.core, 60);
       const gcodeObj = engine.generate();
       
       // 2. Connect and stream

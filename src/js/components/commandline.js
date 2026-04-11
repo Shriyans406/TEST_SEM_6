@@ -16,7 +16,9 @@ export default class Commandline extends Component{
 
     // callback passed to the core.commandline class to update this cmd_line value
     commandLineUpdateCallback(commandLineValue) {  
-        this.commandLineRef.current.value = commandLineValue;
+        if (this.commandLineRef.current) {
+            this.commandLineRef.current.value = commandLineValue;
+        }
     }
 
  render(){

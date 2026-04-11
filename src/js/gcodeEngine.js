@@ -136,16 +136,17 @@ export class GCodeEngine {
     gcode.push("G90 ; Absolute positioning");
     
     // Configurable feedrate
-    const feedrate = 2000;
+    const feedrate = 400;
 
     for (const path of paths) {
       if (path.length === 0) continue;
 
       // Air-travel (G0) to the start of the path
+      gcode.push("M3 S0 ; Pen Up");
       gcode.push(`G0 X${path[0].x.toFixed(3)} Y${path[0].y.toFixed(3)}`);
       
       // Pen down command here (if required, e.g., M280 P0 S90 or Z-axis move)
-      gcode.push("; Pen Down");
+      gcode.push("M3 S90 ; Pen Down");
 
       // Draw the path (G1)
       for (let i = 1; i < path.length; i++) {
@@ -153,7 +154,7 @@ export class GCodeEngine {
       }
 
       // Pen up command here
-      gcode.push("; Pen Up");
+      gcode.push("M3 S0 ; Pen Up");
     }
 
     // Go back to origin 
