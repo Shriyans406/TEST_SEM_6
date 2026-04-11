@@ -1,0 +1,143 @@
+Timing Summary
+==============
+
+   POST-ROUTE
+
+          Group  No. Clocks  No. Clock Pairs  WNS(ps)  TNS(ps)  TNS Endpoints      
+    -----------  ----------  ---------------  -------  -------  -------------      
+   <UDEF_i_clk>           1                1    -1522   -20746             15      
+
+
+
+
+Clocks
+======
+
+            Clock    Clock net         Group  Constrained Period(ps)      Waveform(ps)   Achievable Period(ps)  Achievable Frequency(MHz)
+   --------------  -----------   -----------  ----------------------  -----------------  ---------------------  -------------------------
+            i_clk        i_clk  <UDEF_i_clk>           (auto) 2000            (0,1000)                   3521                    284.010 
+
+
+
+
+Clock Relationships
+===================
+
+       From Clock        To Clock               Group    Endpoints     WNS(ps)    TNS(ps)  TNS Endpoints
+   --------------  --------------  ------------------  -----------  ----------  ---------  -------------
+            i_clk           i_clk        <UDEF_i_clk>           15       -1522     -20746             15
+
+
+
+
+Timing Details for Clock Pair i_clk and i_clk
+=============================================
+
+       From Clock        To Clock               Group    Endpoints     WNS(ps)    TNS(ps)  TNS Endpoints
+   --------------  --------------  ------------------  -----------  ----------  ---------  -------------
+            i_clk           i_clk        <UDEF_i_clk>           15       -1522     -20746             15
+
+Path 2:
+   Slack (not met):                         -1522ps
+     Path type:                               SETUP
+     Group:                            <UDEF_i_clk>
+     Launching clock:                         i_clk (rising edge)
+     Capturing clock:                         i_clk (rising edge)
+
+     Requested period:                       2000ps
+   + Delay of the capturing clock:           2319ps
+   - Clock uncertainty:                       150ps
+   = Required time:                          4169ps
+   - Propagation time:                       3372ps (83.0% logic, 17.0% route, logic stage 1)
+   - Delay of the launching clock:           2319ps
+   = Slack:                                 -1522ps
+
+   Instance/Pin or Net Name   Type         ID    Location or Fanout   Delay(ps)  Edge  Arrival Time(ps)    Instance detail                                                                                                       
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   i_clk                      CLOCK-PORT    -                     -     launch     r               0                                                                                                                             
+   i_clk                      Clock net    12          (fanout=144)       2319                     -                                                                                                                             
+   RBB_18/CLK                 RBB_6L       18  [TILE 0 0, RBB 25 8]          -     r            2319                                                                                                                             
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_18/DMUX                RBB_6L       18  [TILE 0 0, RBB 25 8]       1410     r            3729     {inst37: $auto$ff.cc:266:slice$1863 (FDR,site=dffo)}                                                                    
+   z_step_prev                Net           4            (fanout=1)        573                     -                                                                                                                             
+   RBB_18/A1                  RBB_6L       18  [TILE 0 0, RBB 25 8]          -     r            4302     {inst51: $auto$xilinx_dffopt.cc:338:execute$2514 (LUT,site=aluto)} {inst43: $auto$ff.cc:266:slice$1869 (FDR,site=affo)} 
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_18/CLK                 RBB_6L       18  [TILE 0 0, RBB 25 8]       1389     r            5691                                                                                                                             
+   i_clk                      Clock net    12          (fanout=144)      -2319                     -                                                                                                                             
+   i_clk                      CLOCK-PORT    -                     -    capture     r            3372                                                                                                                             
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Path 0:
+   Slack (not met):                         -1500ps
+     Path type:                               SETUP
+     Group:                            <UDEF_i_clk>
+     Launching clock:                         i_clk (rising edge)
+     Capturing clock:                         i_clk (rising edge)
+
+     Requested period:                       2000ps
+   + Delay of the capturing clock:           2319ps
+   - Clock uncertainty:                       150ps
+   = Required time:                          4169ps
+   - Propagation time:                       3422ps (60.8% logic, 39.2% route, logic stage 1)
+   - Delay of the launching clock:           2247ps
+   = Slack:                                 -1500ps
+
+   Instance/Pin or Net Name   Type         ID     Location or Fanout   Delay(ps)  Edge  Arrival Time(ps)    Instance detail                                                                                                       
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   i_clk                      CLOCK-PORT    -                      -     launch     r               0                                                                                                                             
+   i_clk                      Clock net    12           (fanout=144)       2247                     -                                                                                                                             
+   RBB_19/CLK                 RBB_6L       19  [TILE 0 0, RBB 25 10]          -     r            2247                                                                                                                             
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_19/DQ                  RBB_6L       19  [TILE 0 0, RBB 25 10]        800     r            3047     {inst45: $auto$ff.cc:266:slice$1871 (FDR,site=dff)}                                                                     
+   y_step_prev                Net           5             (fanout=1)       1342                     -                                                                                                                             
+   RBB_18/B1                  RBB_6L       18   [TILE 0 0, RBB 25 8]          -     r            4389     {inst50: $auto$xilinx_dffopt.cc:338:execute$2510 (LUT,site=bluto)} {inst41: $auto$ff.cc:266:slice$1867 (FDR,site=bffo)} 
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_18/CLK                 RBB_6L       18   [TILE 0 0, RBB 25 8]       1280     r            5669                                                                                                                             
+   i_clk                      Clock net    12           (fanout=144)      -2319                     -                                                                                                                             
+   i_clk                      CLOCK-PORT    -                      -    capture     r            3350                                                                                                                             
+   ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Path 3:
+   Slack (not met):                         -1470ps
+     Path type:                               SETUP
+     Group:                            <UDEF_i_clk>
+     Launching clock:                         i_clk (rising edge)
+     Capturing clock:                         i_clk (rising edge)
+
+     Requested period:                       2000ps
+   + Delay of the capturing clock:           2319ps
+   - Clock uncertainty:                       150ps
+   = Required time:                          4169ps
+   - Propagation time:                       3320ps (79.5% logic, 20.5% route, logic stage 1)
+   - Delay of the launching clock:           2319ps
+   = Slack:                                 -1470ps
+
+   Instance/Pin or Net Name   Type         ID    Location or Fanout   Delay(ps)  Edge  Arrival Time(ps)    Instance detail                                                                                                       
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   i_clk                      CLOCK-PORT    -                     -     launch     r               0                                                                                                                             
+   i_clk                      Clock net    12          (fanout=144)       2319                     -                                                                                                                             
+   RBB_18/CLK                 RBB_6L       18  [TILE 0 0, RBB 25 8]          -     r            2319                                                                                                                             
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_18/AMUX                RBB_6L       18  [TILE 0 0, RBB 25 8]       1386     r            3705     {inst43: $auto$ff.cc:266:slice$1869 (FDR,site=affo)}                                                                    
+   z_phase[1]                 Net           2            (fanout=3)        679                     -                                                                                                                             
+   RBB_18/A5                  RBB_6L       18  [TILE 0 0, RBB 25 8]          -     r            4384     {inst51: $auto$xilinx_dffopt.cc:338:execute$2514 (LUT,site=aluto)} {inst43: $auto$ff.cc:266:slice$1869 (FDR,site=affo)} 
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   RBB_18/CLK                 RBB_6L       18  [TILE 0 0, RBB 25 8]       1255     r            5639                                                                                                                             
+   i_clk                      Clock net    12          (fanout=144)      -2319                     -                                                                                                                             
+   i_clk                      CLOCK-PORT    -                     -    capture     r            3320                                                                                                                             
+   --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
