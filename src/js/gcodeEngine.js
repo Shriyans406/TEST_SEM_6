@@ -132,8 +132,8 @@ export class GCodeEngine {
   // 3. String Conversion
   convertToGCode(paths) {
     let gcode = [];
-    gcode.push("G21 ; Set units to millimeters");
-    gcode.push("G90 ; Absolute positioning");
+    // Hardware is basic: skip G21/G90 since they might not reply with 'ok'
+
     
     // Configurable feedrate
     const feedrate = 400;
