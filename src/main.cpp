@@ -4,12 +4,14 @@
 
 ShrikeFlash fpga;
 
-// --- PIN MAPPING ---
-const int STATUS_LED = 4; // Using RP_IO4 as identified from the Shrike Lite diagram
+// --- FINAL PIN MAPPING (RP2040 Handshake Bridge) ---
+const int STATUS_LED = 4; // RP_IO4 for onboard status
 
-const int X_STEP = 14; const int X_DIR = 15;
-const int Y_STEP = 18; const int Y_DIR = 17;
-const int Z_STEP = 21; const int Z_DIR = 22; // Note: Moving Z will also blink the LED on IO21!
+// RP2040 Pins talking to FPGA Inputs
+const int X_STEP = 21; const int X_DIR = 20;
+const int Y_STEP = 17; const int Y_DIR = 18;
+const int Z_STEP = 15; const int Z_DIR = 14;
+const int RST_PIN = 19; // FPGA i_rst (GPIO 03)
 
 const float STEPS_PER_MM = 256.0;
 float curX = 0, curY = 0, curZ = 0;
@@ -22,7 +24,7 @@ void setup() {
     Serial.begin(115200);
     while (!Serial);
     delay(1000);
-    Serial.println("\n--- SHRIKE LITE DIAGNOSTIC BOOT ---");
+    Serial.println("\n--- SHRIKE LITE CNC: FINAL PIN SYNC BOOT ---");
 
     pinMode(STATUS_LED, OUTPUT);
     
@@ -31,6 +33,12 @@ void setup() {
         digitalWrite(STATUS_LED, !digitalRead(STATUS_LED));
         delay(100);
     }
+
+    // FPGA Logic Reset Sequence
+    pinMode(RST_PIN, OUTPUT);
+    digitalWrite(RST_PIN, HIGH);
+    delay(10);
+    digitalWrite(RST_PIN, LOW);
 
     if (!LittleFS.begin() || !fpga.begin()) {
         Serial.println("SYSTEM ERROR: Check hardware connections.");
@@ -56,13 +64,15 @@ void loop() {
         if (line.startsWith("G1") || line.startsWith("G0")) {
             float tX = extractValue(line, 'X', curX);
             float tY = extractValue(line, 'Y', curY);
+            float tZ = extractValue(line, 'Z', curZ);
             
-            // LOGGING: Confirm the numbers extracted from the G-code
+            // LOGGING: Confirm numbers extracted
             Serial.print("Target Coordinates -> X:"); Serial.print(tX);
-            Serial.print(" Y:"); Serial.println(tY);
+            Serial.print(" Y:"); Serial.print(tY);
+            Serial.print(" Z:"); Serial.println(tZ);
 
             digitalWrite(STATUS_LED, HIGH); // LED ON during movement
-            moveAxes(tX, tY, curZ);
+            moveAxes(tX, tY, tZ);
             digitalWrite(STATUS_LED, LOW);  // LED OFF when done
             
             Serial.println("ok");
@@ -82,14 +92,17 @@ void moveAxes(float tx, float ty, float tz) {
     // Calculate relative movement steps
     long sX = abs((tx - curX) * STEPS_PER_MM);
     long sY = abs((ty - curY) * STEPS_PER_MM);
+    long sZ = abs((tz - curZ) * STEPS_PER_MM);
     
-    // LOGGING: See the actual "Pulses" being sent
+    // LOGGING: Actual pulses calculated
     Serial.print("PULSE COUNT: X="); Serial.print(sX);
-    Serial.print(", Y="); Serial.println(sY);
+    Serial.print(", Y="); Serial.print(sY);
+    Serial.print(", Z="); Serial.println(sZ);
 
-    if (sX > 0 || sY > 0) {
+    if (sX > 0 || sY > 0 || sZ > 0) {
         digitalWrite(X_DIR, (tx - curX) >= 0 ? HIGH : LOW);
         digitalWrite(Y_DIR, (ty - curY) >= 0 ? HIGH : LOW);
+        digitalWrite(Z_DIR, (tz - curZ) >= 0 ? HIGH : LOW);
 
         // X-Axis Stepping
         for(long i=0; i<sX; i++) {
@@ -101,7 +114,12 @@ void moveAxes(float tx, float ty, float tz) {
             digitalWrite(Y_STEP, 1); delayMicroseconds(950);
             digitalWrite(Y_STEP, 0); delayMicroseconds(950);
         }
+        // Z-Axis Stepping
+        for(long i=0; i<sZ; i++) {
+            digitalWrite(Z_STEP, 1); delayMicroseconds(950);
+            digitalWrite(Z_STEP, 0); delayMicroseconds(950);
+        }
     }
 
-    curX = tx; curY = ty;
+    curX = tx; curY = ty; curZ = tz;
 }
