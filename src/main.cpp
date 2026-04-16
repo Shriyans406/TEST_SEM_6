@@ -105,12 +105,12 @@ void moveAxes(float tx, float ty, float tz) {
         digitalWrite(Y_DIR, (ty - curY) >= 0 ? HIGH : LOW);
         digitalWrite(Z_DIR, (tz - curZ) >= 0 ? HIGH : LOW);
 
-        // Move X
-        for(long i=0; i<sX; i++) { digitalWrite(X_STEP, 1); delayMicroseconds(1000); digitalWrite(X_STEP, 0); delayMicroseconds(1000); }
+        // Move X 
+        for(long i=0; i<sX; i++) { digitalWrite(X_STEP, 1); delayMicroseconds(5000); digitalWrite(X_STEP, 0); delayMicroseconds(5000); }
         // Move Y
-        for(long i=0; i<sY; i++) { digitalWrite(Y_STEP, 1); delayMicroseconds(1000); digitalWrite(Y_STEP, 0); delayMicroseconds(1000); }
+        for(long i=0; i<sY; i++) { digitalWrite(Y_STEP, 1); delayMicroseconds(5000); digitalWrite(Y_STEP, 0); delayMicroseconds(5000); }
         // Move Z
-        for(long i=0; i<sZ; i++) { digitalWrite(Z_STEP, 1); delayMicroseconds(1000); digitalWrite(Z_STEP, 0); delayMicroseconds(1000); }
+        for(long i=0; i<sZ; i++) { digitalWrite(Z_STEP, 1); delayMicroseconds(5000); digitalWrite(Z_STEP, 0); delayMicroseconds(5000); }
     }
 
     curX = tx; curY = ty; curZ = tz;
