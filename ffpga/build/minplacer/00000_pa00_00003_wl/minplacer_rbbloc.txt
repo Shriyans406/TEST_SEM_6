@@ -1,5 +1,5 @@
-RBB 18: chip_tile_x=0, chip_tile_y=0, chip_x=25, chip_y=8
-RBB 19: chip_tile_x=0, chip_tile_y=0, chip_x=25, chip_y=10
+RBB 18: chip_tile_x=0, chip_tile_y=0, chip_x=22, chip_y=10
+RBB 19: chip_tile_x=0, chip_tile_y=0, chip_x=28, chip_y=10
 RBB 20: chip_tile_x=0, chip_tile_y=0, chip_x=22, chip_y=8
 RBB 0: chip_tile_x=0, chip_tile_y=0, chip_x=0, chip_y=6
 RBB 1: chip_tile_x=0, chip_tile_y=0, chip_x=0, chip_y=7

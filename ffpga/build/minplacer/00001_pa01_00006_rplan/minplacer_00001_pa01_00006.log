@@ -1,9 +1,9 @@
-The current time is Sat Apr 11 15:07:14 2026
+The current time is Thu Apr 16 20:23:32 2026
 CPUs=4
 EXE="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe"
 BuildDir=C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23
 BuildPath="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23"
-CWD=C:\Users\HP\AppData\Local\Temp\HzlpwKdv\out\minplacer\00001_pa01_00006_rplan
+CWD=C:\Users\HP\AppData\Local\Temp\ypyZZRJP\out\minplacer\00001_pa01_00006_rplan
 LogFile=minplacer_00001_pa01_00006.log
 PrintScreen=..\_00001_pa01_stdout.txt
 Command line: C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe -print_screen ..\_00001_pa01_stdout.txt -eflx_call_minplacer 00001_pa01_00006_rplan__out__cnc_sequencer
@@ -135,16 +135,16 @@ GeometryDumpLayers starts.
 GeometryDumpLayers ends.
 pProblemIni. eramclkAsClock=1
 pProblemIniNetlist. skip_hifi=0, skip_pppff=2147483647
-Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=30
+Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=29
 NumPinst=21
 	DontPlace=0, NonRootRbbChainMember=0, NonRootDspChainMember=0, Const=1, ClkBuf=1
 There are 23 instances. After combining instances in chains, there are 21 instances to place.
 	Clock[0] OrigClock[0] net (net_index=12) i_clk
-NumPnet=28
+NumPnet=27
 NumTrivial=0 NumDriverless=0
-AverageFO=1.68 #HifiNet=0 AverageFO_HifiNet=0.00
+AverageFO=1.70 #HifiNet=0 AverageFO_HifiNet=0.00
 NumClk=1 (with 0 inverted)
-There are 28 nets in the design. Average fanout is 1.68.
+There are 27 nets in the design. Average fanout is 1.70.
 There is 1 clock in the design.
 NumInsts=21
 Resource usages:
@@ -159,7 +159,7 @@ pPipeAlloc: OptMode=1 PppFfInsertDone=0 MinPipeRtDly=98 #Chain=0 AveChainLen=0.0
 (0) INI ELAPSE=0
 
 FINDER COMPUTE-FULL.
-Long connection estimation: ..............
+Long connection estimation: .............
 Short connection estimation: ..............
 Long connection estimation: (50)w---------(60)----------(70)----------(80)----------(90)----------(100)-
 Long connection estimation: (50)pxxxxxxxxx(60)xxxxxxxxxx(70)xxxxxxxxxx(80)xxxxxxxxxx(90)xxxxxxxxxx(100)x
@@ -211,7 +211,7 @@ CLOCK[0] #LockedPort=1 #AssignedPort=0 #OutputPort=0 TX0Y0={#Cluster=1 L=3 IOB=1
 Placement timing:
          Clock         Group  Achievable Frequency(MHz)
 --------------   -----------  -------------------------
-         i_clk  <UDEF_i_clk>                   291.460 
+         i_clk  <UDEF_i_clk>                   264.620 
 
 
 FINDER ENDS
@@ -219,7 +219,7 @@ pProblemFin.
 Min-placement step ends: Delay and congestion estimation (fastest_delay=0 gentable=0 mode=1). Runtime: 0:0:10 (CPU time), 0:0:10 (real time); peak memory: 1374MB.
 
 
-The current time is Sat Apr 11 15:07:24 2026
+The current time is Thu Apr 16 20:23:42 2026
 
 
 

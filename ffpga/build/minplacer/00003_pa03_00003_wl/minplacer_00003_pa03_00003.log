@@ -1,15 +1,15 @@
-LOG STARTS The current time is Sat Apr 11 15:06:43 2026
+LOG STARTS The current time is Thu Apr 16 20:44:38 2026
 TA took 0 seconds.
-LOG ENDS The current time is Sat Apr 11 15:06:43 2026
+LOG ENDS The current time is Thu Apr 16 20:44:40 2026
 
 
 
-The current time is Sat Apr 11 15:06:43 2026
+The current time is Thu Apr 16 20:44:41 2026
 CPUs=4
 EXE="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe"
 BuildDir=C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23
 BuildPath="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23"
-CWD=C:\Users\HP\AppData\Local\Temp\HzlpwKdv\out\minplacer\00003_pa03_00003_wl
+CWD=C:\Users\HP\AppData\Local\Temp\Zqoqmdxh\out\minplacer\00003_pa03_00003_wl
 LogFile=minplacer_00003_pa03_00003.log
 PrintScreen=..\_00003_pa03_stdout.txt
 Command line: C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe -print_screen ..\_00003_pa03_stdout.txt -eflx_call_minplacer 00003_pa03_00003_wl__out__cnc_sequencer
@@ -165,7 +165,7 @@ pDelayLibIni. pdelay_estimate_pppff_delay=120
 TileRange read: File is not given. Use whole chip.
 Reading timing_def file ..\..\minplacer\00003_pa03_00002_setup\minplacer.timing_def
 pPipeAlloc: OptMode=1 PppFfInsertDone=0 MinPipeRtDly=98 #Chain=0 AveChainLen=0.0 MaxChainLen=0 #Net=0 AveChainFan=0.0 MaxChainFan=0 #MixedZeroFan=0 Opt_UseLatency=0 OptLine_RightSlack_WorseThreshold=100
-(0): Ini TileRange={0,1; 0,1}. IsTiny=0 IsLowUtil=0. CurMem=236048384 PeakMem=369655808
+(0): Ini TileRange={0,1; 0,1}. IsTiny=0 IsLowUtil=0. CurMem=232701952 PeakMem=366301184
 ALWAYS_CLKPLC=0
 RandomPlacement ends.
 FORCE(1): Initial random illegal placement generated.
@@ -229,12 +229,12 @@ Placement timing:
 
 
 pDelayLibFin
-(54): Fin. CurMem=34197504 PeakMem=369655808
+(54): Fin. CurMem=30961664 PeakMem=366301184
 pProblemFin.
 Min-placement step ends: Global placement and legalization. Runtime: 0:0:10 (CPU time), 0:0:10 (real time); peak memory: 1304MB.
 
 
-The current time is Sat Apr 11 15:06:53 2026
+The current time is Thu Apr 16 20:44:51 2026
 
 
 

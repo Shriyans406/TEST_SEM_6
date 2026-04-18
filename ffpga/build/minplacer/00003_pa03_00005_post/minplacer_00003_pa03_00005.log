@@ -1,9 +1,9 @@
-The current time is Sat Apr 11 15:07:04 2026
+The current time is Thu Apr 16 20:45:01 2026
 CPUs=4
 EXE="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe"
 BuildDir=C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23
 BuildPath="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23"
-CWD=C:\Users\HP\AppData\Local\Temp\HzlpwKdv\out\minplacer\00003_pa03_00005_post
+CWD=C:\Users\HP\AppData\Local\Temp\Zqoqmdxh\out\minplacer\00003_pa03_00005_post
 LogFile=minplacer_00003_pa03_00005.log
 PrintScreen=..\_00003_pa03_stdout.txt
 Command line: C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe -print_screen ..\_00003_pa03_stdout.txt -eflx_call_minplacer 00003_pa03_00005_post__out__cnc_sequencer
@@ -228,7 +228,7 @@ pProblemFin.
 Min-placement step ends: Detaild placement (mode=2). Runtime: 0:0:10 (CPU time), 0:0:10 (real time); peak memory: 1415MB.
 
 
-The current time is Sat Apr 11 15:07:14 2026
+The current time is Thu Apr 16 20:45:11 2026
 
 
 

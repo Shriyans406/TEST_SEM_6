@@ -1,9 +1,9 @@
-The current time is Sat Apr 11 15:06:53 2026
+The current time is Thu Apr 16 20:23:11 2026
 CPUs=4
 EXE="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe"
 BuildDir=C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23
 BuildPath="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23"
-CWD=C:\Users\HP\AppData\Local\Temp\HzlpwKdv\out\minplacer\00001_pa01_00004_repopt
+CWD=C:\Users\HP\AppData\Local\Temp\ypyZZRJP\out\minplacer\00001_pa01_00004_repopt
 LogFile=minplacer_00001_pa01_00004.log
 PrintScreen=..\_00001_pa01_stdout.txt
 Command line: C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe -print_screen ..\_00001_pa01_stdout.txt -eflx_call_minplacer 00001_pa01_00004_repopt__out__cnc_sequencer
@@ -130,16 +130,16 @@ GeometryDumpLayers starts.
 GeometryDumpLayers ends.
 pProblemIni. eramclkAsClock=1
 pProblemIniNetlist. skip_hifi=0, skip_pppff=2147483647
-Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=30
+Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=29
 NumPinst=21
 	DontPlace=0, NonRootRbbChainMember=0, NonRootDspChainMember=0, Const=1, ClkBuf=1
 There are 23 instances. After combining instances in chains, there are 21 instances to place.
 	Clock[0] OrigClock[0] net (net_index=12) i_clk
-NumPnet=28
+NumPnet=27
 NumTrivial=0 NumDriverless=0
-AverageFO=1.68 #HifiNet=0 AverageFO_HifiNet=0.00
+AverageFO=1.70 #HifiNet=0 AverageFO_HifiNet=0.00
 NumClk=1 (with 0 inverted)
-There are 28 nets in the design. Average fanout is 1.68.
+There are 27 nets in the design. Average fanout is 1.70.
 There is 1 clock in the design.
 NumInsts=21
 Resource usages:
@@ -156,11 +156,11 @@ TileRange read: File is not given. Use whole chip.
 Read 21 RBB-locations from EFLX file.
 Reading timing_def file ..\..\minplacer\00001_pa01_00002_setup\minplacer.timing_def
 pPipeAlloc: OptMode=1 PppFfInsertDone=0 MinPipeRtDly=98 #Chain=0 AveChainLen=0.0 MaxChainLen=0 #Net=0 AveChainFan=0.0 MaxChainFan=0 #MixedZeroFan=0 Opt_UseLatency=0 OptLine_RightSlack_WorseThreshold=100
-(0) INI TWL = 4530(1570, 2960) ELAPSE=1
-CROSS-TILE STAT: [0]=47
-(1) OPT TWL = 4530(1570, 2960) ELAPSE=1
-(2) FIN TWL = 4530(1570, 2960) ELAPSE=1
-CROSS-TILE STAT: [0]=47
+(0) INI TWL = 4160(1490, 2670) ELAPSE=0
+CROSS-TILE STAT: [0]=46
+(1) OPT TWL = 4160(1490, 2670) ELAPSE=0
+(2) FIN TWL = 4160(1490, 2670) ELAPSE=0
+CROSS-TILE STAT: [0]=46
 Wrote 3 RBB-locations out of 3 core insts and 0 chained insts to EFLX file ..\..\minplacer\00001_pa01_00004_repopt\minplacer_rbbloc.txt.
 Wrote 18 RBB-locations out of 18 IOB insts to EFLX file ..\..\minplacer\00001_pa01_00004_repopt\minplacer_rbbloc.txt.
 Wrote 0 RBB-locations out of 18 INTIOB insts to EFLX file ..\..\minplacer\00001_pa01_00004_repopt\minplacer_rbbloc.txt.
@@ -204,17 +204,17 @@ CLOCK[0] #LockedPort=1 #AssignedPort=0 #OutputPort=0 TX0Y0={#Cluster=1 L=3 IOB=1
 Placement timing:
          Clock         Group  Achievable Frequency(MHz)
 --------------   -----------  -------------------------
-         i_clk  <UDEF_i_clk>                   356.633 
+         i_clk  <UDEF_i_clk>                   350.508 
 
 
 pDelayLibFin
 REP ENDS
 
 pProblemFin.
-Min-placement step ends: Replication (mode=1). Runtime: 0:0:10 (CPU time), 0:0:11 (real time); peak memory: 1337MB.
+Min-placement step ends: Replication (mode=1). Runtime: 0:0:10 (CPU time), 0:0:10 (real time); peak memory: 1337MB.
 
 
-The current time is Sat Apr 11 15:07:04 2026
+The current time is Thu Apr 16 20:23:21 2026
 
 
 
