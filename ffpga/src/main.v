@@ -1,6 +1,6 @@
 (* top *) module cnc_sequencer (
-    (* iopad_external_pin, clkbuf_inhibit *) input i_clk,   // Map to OSC_CLK
-    (* iopad_external_pin *) input i_rst,                  // Map to PIN 16
+    (* iopad_external_pin, clkbuf_inhibit *) input i_clk,   // Internal OSC (Target: 24MHz)
+    (* iopad_external_pin *) input i_rst,
 
     // Inputs from RP2040
     (* iopad_external_pin *) input i_x_step, i_x_dir,
@@ -21,9 +21,13 @@
     assign o_motor_en = 1'b1;
     assign o_status_led = 1'b1;
 
-    // Registers to detect the rising edge of the step signals
+    // --- TIMING PROTECTION: Synchronizers ---
+    // We use 2-stage shift registers to stabilize the asynchronous MCU signals
+    reg [1:0] x_step_sync, x_dir_sync;
+    reg [1:0] y_step_sync, y_dir_sync;
+    reg [1:0] z_step_sync, z_dir_sync;
+
     reg [1:0] x_phase, y_phase, z_phase;
-    reg x_step_prev, y_step_prev, z_step_prev;
 
     // Phase pattern function
     function [3:0] step_pattern(input [1:0] phase);
@@ -35,26 +39,34 @@
         endcase
     endfunction
 
-    // Main synchronous logic block
     always @(posedge i_clk) begin
-        if (i_rst) begin
-            x_phase <= 0; y_phase <= 0; z_phase <= 0;
-            x_step_prev <= 0; y_step_prev <= 0; z_step_prev <= 0;
-        end else begin
-            // Detect Rising Edge for X (Motor C)
-            x_step_prev <= i_x_step;
-            if (i_x_step && !x_step_prev)
-                x_phase <= (i_x_dir) ? x_phase - 1 : x_phase + 1;
+        // Double-flop the inputs to prevent metastability glitches
+        x_step_sync <= {x_step_sync[0], i_x_step};
+        x_dir_sync  <= {x_dir_sync[0],  i_x_dir};
+        
+        y_step_sync <= {y_step_sync[0], i_y_step};
+        y_dir_sync  <= {y_dir_sync[0],  i_y_dir};
+        
+        z_step_sync <= {z_step_sync[0], i_z_step};
+        z_dir_sync  <= {z_dir_sync[0],  i_z_dir};
 
-            // Detect Rising Edge for Y (Motor B)
-            y_step_prev <= i_y_step;
-            if (i_y_step && !y_step_prev)
-                y_phase <= (i_y_dir) ? y_phase - 1 : y_phase + 1;
+        // Check for Rising Edge on the SYNCHRONIZED signal
+        // X-AXIS
+        if (x_step_sync == 2'b01) begin // This detects the 0 -> 1 transition cleanly
+            if (x_dir_sync[1]) x_phase <= x_phase - 1;
+            else               x_phase <= x_phase + 1;
+        end
 
-            // Detect Rising Edge for Z (Motor A)
-            z_step_prev <= i_z_step;
-            if (i_z_step && !z_step_prev)
-                z_phase <= (i_z_dir) ? z_phase - 1 : z_phase + 1;
+        // Y-AXIS
+        if (y_step_sync == 2'b01) begin
+            if (y_dir_sync[1]) y_phase <= y_phase - 1;
+            else               y_phase <= y_phase + 1;
+        end
+
+        // Z-AXIS
+        if (z_step_sync == 2'b01) begin
+            if (z_dir_sync[1]) z_phase <= z_phase - 1;
+            else               z_phase <= z_phase + 1;
         end
     end
 

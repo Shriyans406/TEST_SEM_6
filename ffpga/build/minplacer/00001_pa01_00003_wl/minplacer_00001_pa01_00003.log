@@ -1,15 +1,15 @@
-LOG STARTS The current time is Thu Apr 16 20:44:40 2026
+LOG STARTS The current time is Tue Apr 21 16:56:12 2026
 TA took 0 seconds.
-LOG ENDS The current time is Thu Apr 16 20:44:40 2026
+LOG ENDS The current time is Tue Apr 21 16:56:15 2026
 
 
 
-The current time is Thu Apr 16 20:44:41 2026
+The current time is Tue Apr 21 16:56:15 2026
 CPUs=4
 EXE="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe"
 BuildDir=C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23
 BuildPath="C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23"
-CWD=C:\Users\HP\AppData\Local\Temp\Zqoqmdxh\out\minplacer\00001_pa01_00003_wl
+CWD=C:\Users\HP\AppData\Local\Temp\HOKonkDM\out\minplacer\00001_pa01_00003_wl
 LogFile=minplacer_00001_pa01_00003.log
 PrintScreen=..\_00001_pa01_stdout.txt
 Command line: C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\eda-placer.exe -print_screen ..\_00001_pa01_stdout.txt -eflx_call_minplacer 00001_pa01_00003_wl__out__cnc_sequencer
@@ -139,16 +139,16 @@ GeometryDumpLayers starts.
 GeometryDumpLayers ends.
 pProblemIni. eramclkAsClock=1
 pProblemIniNetlist. skip_hifi=1, skip_pppff=2147483647
-Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=30
+Netlist=NETLIST_cnc_sequencer NumInst=23 NumNet=33
 NumPinst=21
 	DontPlace=0, NonRootRbbChainMember=0, NonRootDspChainMember=0, Const=1, ClkBuf=1
 There are 23 instances. After combining instances in chains, there are 21 instances to place.
-	Clock[0] OrigClock[0] net (net_index=12) i_clk
-NumPnet=28
+	Clock[0] OrigClock[0] net (net_index=20) i_clk
+NumPnet=31
 NumTrivial=0 NumDriverless=0
-AverageFO=1.68 #HifiNet=0 AverageFO_HifiNet=0.00
+AverageFO=1.97 #HifiNet=0 AverageFO_HifiNet=0.00
 NumClk=1 (with 0 inverted)
-There are 28 nets in the design, 0 of which have fanout larger than 49. Average fanout is 1.68.
+There are 31 nets in the design, 0 of which have fanout larger than 49. Average fanout is 1.97.
 There is 1 clock in the design.
 NumInsts=21
 Resource usages:
@@ -157,15 +157,11 @@ Resource usages:
  Type=IOB: Capacity=184 Utilized=18 NumInst=18.
 Clamp util_limit to util_limit_1t 0.950
 INFLATE STARTS WITH REALPIN=1 L-CAP=140 USAGE=3 INFLATE_RATE=0.950 USAGE_LIMIT=133 CONN_LIMIT=25 SKIP_LOWUTIL=1
-INFLATE 1 L-INSTS collected. The first inflated inst has 29 conns
-INFLATE ENDS WITH 1 INSTS INFLATED, USAGE=4
+INFLATE 2 L-INSTS collected. The first inflated inst has 27 conns
+INFLATE ENDS WITH 2 INSTS INFLATED, USAGE=5
 Min-placement step: Global placement and legalization.
-pDelayLibIni read 0 in-tile and 255 cross-tile data points (220 extrapolated) from C:\Program Files\Renesas Electronics\Go Configure Software Hub\external\eda-placer\v23\placedelaylib.txt
-pDelayLibIni. pdelay_estimate_pppff_delay=120
-TileRange read: File is not given. Use whole chip.
-Reading timing_def file ..\..\minplacer\00001_pa01_00002_setup\minplacer.timing_def
 
-FATAL ERROR: Memory allocation failure for size 67108864 from line 54 in C:\fanmo\src\trunk\base\bpage.cpp
+FATAL ERROR: Memory allocation failure for size 201329652 from line 61 in C:\fanmo\src\trunk\place\pdelay.cpp
 Fatal error at line 167 in file C:\fanmo\src\trunk\base\bmem.cpp
 
 

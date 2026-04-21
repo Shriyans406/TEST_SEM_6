@@ -3,15 +3,15 @@
 
 === cnc_sequencer ===
 
-   Number of wires:                 29
-   Number of wire bits:             44
-   Number of public wires:          23
-   Number of public wire bits:      38
+   Number of wires:                 32
+   Number of wire bits:             53
+   Number of public wires:          26
+   Number of public wire bits:      47
    Number of memories:               0
    Number of memory bits:            0
    Number of processes:              0
-   Number of cells:                 27
-     FDRE                            9
+   Number of cells:                 36
+     FDRE                           18
      LUT2                           12
      LUT3                            3
      LUT5                            3
