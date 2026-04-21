@@ -30,6 +30,8 @@ void setup() {
 
     pinMode(STATUS_LED, OUTPUT);
     
+    
+
     // 1. Initial Handshake with the Library
     if (!LittleFS.begin() || !fpga.begin()) {
         Serial.println("SYSTEM ERROR: Handshake failed.");
@@ -41,6 +43,16 @@ void setup() {
     // 2. Flash the FPGA (Must happen before we reconfigure pins 0-3)
     Serial.println("Flashing FPGA...");
     if (fpga.flash("/fpga_logic.bin")) {
+        // Add this to your setup() to "see" inside the board's memory
+        File root = LittleFS.open("/", "r");
+        File file = root.openNextFile();
+        Serial.println("--- FILESYSTEM CONTENTS ---");
+        while (file) {
+            Serial.print("FILE: "); Serial.print(file.name());
+            Serial.print("  SIZE: "); Serial.println(file.size());
+            file = root.openNextFile();
+        }
+        Serial.println("---------------------------");
         Serial.println("FPGA STATUS: LOADED");
     } else {
         Serial.println("FPGA STATUS: FLASH FAILED");
