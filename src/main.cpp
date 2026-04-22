@@ -1,3 +1,109 @@
+/*
+#include <Arduino.h>
+
+// --- PIN MAPPING (4-Wire ULN2003 Setup) ---
+// X-Axis
+const int x_pins[] = {8, 9, 14, 15}; 
+// Y-Axis (Adjust these based on your physical wiring)
+const int y_pins[] = {0, 1, 2, 3};   
+// Z-Axis
+const int z_pins[] = {4, 5, 6, 7};
+
+const int STATUS_LED = 25; // Internal RP2040 LED
+
+const float STEPS_PER_MM = 256.0;
+float curX = 0, curY = 0, curZ = 0;
+
+// The 4-step sequence for ULN2003 (Wave Drive)
+const int step_seq[4][4] = {
+  {1, 0, 0, 0},
+  {0, 1, 0, 0},
+  {0, 0, 1, 0},
+  {0, 0, 0, 1}
+};
+
+int x_step_idx = 0;
+int y_step_idx = 0;
+int z_step_idx = 0;
+
+void stepMotor(const int pins[], int &idx, bool forward) {
+    if (forward) idx = (idx + 1) % 4;
+    else idx = (idx + 3) % 4; // Move backward
+
+    for (int i = 0; i < 4; i++) {
+        digitalWrite(pins[i], step_seq[idx][i]);
+    }
+}
+
+float extractValue(String g, char c, float defaultValue);
+void moveAxes(float tx, float ty, float tz);
+
+void setup() {
+    Serial.begin(115200);
+    delay(2000); 
+    Serial.println("\n--- MCU DIRECT CONTROL: PLOTTER READY ---");
+
+    pinMode(STATUS_LED, OUTPUT);
+
+    for(int i=0; i<4; i++) {
+        pinMode(x_pins[i], OUTPUT);
+        pinMode(y_pins[i], OUTPUT);
+        pinMode(z_pins[i], OUTPUT);
+    }
+}
+
+void loop() {
+    if (Serial.available() > 0) {
+        String line = Serial.readStringUntil('\n');
+        line.trim();
+
+        if (line.startsWith("G1") || line.startsWith("G0")) {
+            float tX = extractValue(line, 'X', curX);
+            float tY = extractValue(line, 'Y', curY);
+            float tZ = extractValue(line, 'Z', curZ);
+            
+            digitalWrite(STATUS_LED, HIGH);
+            moveAxes(tX, tY, tZ);
+            digitalWrite(STATUS_LED, LOW);
+            
+            Serial.println("ok");
+        }
+    }
+}
+
+float extractValue(String g, char c, float defaultValue) {
+    int pos = g.indexOf(c);
+    if (pos == -1) return defaultValue;
+    int endPos = g.indexOf(' ', pos);
+    if (endPos == -1) endPos = g.length();
+    return g.substring(pos + 1, endPos).toFloat();
+}
+
+void moveAxes(float tx, float ty, float tz) {
+    long sX = abs((tx - curX) * STEPS_PER_MM);
+    long sY = abs((ty - curY) * STEPS_PER_MM);
+    long sZ = abs((tz - curZ) * STEPS_PER_MM);
+    
+    bool dirX = (tx - curX) >= 0;
+    bool dirY = (ty - curY) >= 0;
+    bool dirZ = (tz - curZ) >= 0;
+
+    // Find the max steps to synchronize the movement timing
+    long maxSteps = max(sX, max(sY, sZ));
+
+    for (long i = 0; i < maxSteps; i++) {
+        if (i < sX) stepMotor(x_pins, x_step_idx, dirX);
+        if (i < sY) stepMotor(y_pins, y_step_idx, dirY);
+        if (i < sZ) stepMotor(z_pins, z_step_idx, dirZ);
+        
+        delayMicroseconds(2000); // Control speed here
+    }
+
+    curX = tx; curY = ty; curZ = tz;
+}
+
+*/
+
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <Shrike.h>
