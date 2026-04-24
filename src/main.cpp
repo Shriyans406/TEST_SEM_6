@@ -1,14 +1,12 @@
-
-/*
 #include <Arduino.h>
 
 // --- PIN MAPPING (4-Wire ULN2003 Setup) ---
 // X-Axis
-const int x_pins[] = {8, 9, 14, 15}; 
+const int x_pins[] = {5, 6, 7, 8}; 
 // Y-Axis (Adjust these based on your physical wiring)
-const int y_pins[] = {0, 1, 2, 3};   
+const int y_pins[] = {10, 11, 14, 15};   
 // Z-Axis
-const int z_pins[] = {4, 5, 6, 7};
+const int z_pins[] = {21, 22, 23, 24};
 
 const int STATUS_LED = 25; // Internal RP2040 LED
 
@@ -103,14 +101,14 @@ void moveAxes(float tx, float ty, float tz) {
     curX = tx; curY = ty; curZ = tz;
 }
 
-*/
+
 
 
 
 
 
 //main code
-
+/*
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <Shrike.h>
@@ -231,13 +229,265 @@ void moveAxes(float tx, float ty, float tz) {
         digitalWrite(Z_DIR, (tz - curZ) >= 0 ? HIGH : LOW);
 
         // Move X 
-        for(long i=0; i<sX; i++) { digitalWrite(X_STEP, 1); delayMicroseconds(1000); digitalWrite(X_STEP, 0); delayMicroseconds(1000); }
+        for(long i=0; i<sX; i++) { digitalWrite(X_STEP, 1); delayMicroseconds(2500); digitalWrite(X_STEP, 0); delayMicroseconds(2000); }
         // Move Y
-        for(long i=0; i<sY; i++) { digitalWrite(Y_STEP, 1); delayMicroseconds(1000); digitalWrite(Y_STEP, 0); delayMicroseconds(10000); }
+        for(long i=0; i<sY; i++) { digitalWrite(Y_STEP, 1); delayMicroseconds(2500); digitalWrite(Y_STEP, 0); delayMicroseconds(2000); }
         // Move Z
-        for(long i=0; i<sZ; i++) { digitalWrite(Z_STEP, 1); delayMicroseconds(1000); digitalWrite(Z_STEP, 0); delayMicroseconds(1000); }
+        for(long i=0; i<sZ; i++) { digitalWrite(Z_STEP, 1); delayMicroseconds(2000); digitalWrite(Z_STEP, 0); delayMicroseconds(2000); }
     }
 
     curX = tx; curY = ty; curZ = tz;
 }
 
+*/
+
+
+
+/*
+#include <Arduino.h>
+#include <LittleFS.h>
+#include <Shrike.h>
+
+ShrikeFlash fpga;
+
+// --- PIN MAPPING ---
+const int X_STEP  = 15; 
+const int X_DIR   = 14; 
+const int Y_STEP  = 0;  
+const int Y_DIR   = 3;  
+const int Z_STEP  = 1;  
+const int Z_DIR   = 13; 
+const int RST_PIN = 2;  
+
+const int STATUS_LED = 25;
+
+const float STEPS_PER_MM = 256.0;
+float curX = 0, curY = 0, curZ = 0;
+
+void moveAxes(float tx, float ty, float tz);
+float extractValue(String g, char c, float defaultValue);
+
+void setup() {
+    Serial.begin(115200);
+    delay(2000); 
+    Serial.println("\n--- CNC MASTER CONTROLLER: INITIALIZING ---");
+
+    pinMode(STATUS_LED, OUTPUT);
+    digitalWrite(STATUS_LED, HIGH);
+
+    // =========================
+    // 1. Mount LittleFS
+    // =========================
+    if (!LittleFS.begin()) {
+        Serial.println("FATAL ERROR: LittleFS mount failed.");
+        return;
+    }
+
+    // =========================
+    // 2. List Files (DEBUG)
+    // =========================
+    Serial.println("--- FILES IN FLASH ---");
+    File root = LittleFS.open("/", "r");
+    File file = root.openNextFile();
+    while (file) {
+        Serial.print("FILE: ");
+        Serial.println(file.name());
+        file = root.openNextFile();
+    }
+    Serial.println("----------------------");
+
+    // =========================
+    // 3. Init FPGA Interface
+    // =========================
+    if (!fpga.begin()) {
+        Serial.println("FATAL ERROR: FPGA init failed.");
+        return;
+    }
+
+    // =========================
+    // 4. Flash FPGA
+    // =========================
+    if (LittleFS.exists("/fpga_logic.bin")) {
+        Serial.println("Flashing fpga_logic.bin...");
+
+        if (fpga.flash("/fpga_logic.bin")) {
+            Serial.println("FPGA STATUS: LOADED SUCCESSFULLY");
+        } else {
+            Serial.println("FPGA STATUS: FLASH FAILED");
+            return;
+        }
+
+    } else {
+        Serial.println("ERROR: fpga_logic.bin NOT FOUND");
+        return;
+    }
+
+    // =========================
+    // 5. Configure Pins AFTER flash
+    // =========================
+    pinMode(RST_PIN, OUTPUT);
+    pinMode(X_STEP, OUTPUT); pinMode(X_DIR, OUTPUT);
+    pinMode(Y_STEP, OUTPUT); pinMode(Y_DIR, OUTPUT);
+    pinMode(Z_STEP, OUTPUT); pinMode(Z_DIR, OUTPUT);
+
+    // =========================
+    // 6. Reset FPGA (IMPORTANT)
+    // =========================
+    digitalWrite(RST_PIN, LOW);
+    delay(100);
+    digitalWrite(RST_PIN, HIGH);
+
+    Serial.println("FPGA RESET DONE");
+
+    // =========================
+    // 7. Basic FPGA TEST (VERY IMPORTANT)
+    // =========================
+    Serial.println("Testing FPGA response (STEP pulse)...");
+
+    digitalWrite(X_STEP, HIGH);
+    delay(200);
+    digitalWrite(X_STEP, LOW);
+
+    Serial.println("If LEDs blink → FPGA is working");
+
+    digitalWrite(STATUS_LED, LOW);
+    Serial.println("SYSTEM READY: Send G1 X.. Y.. Z..");
+}
+
+void loop() {
+    if (Serial.available() > 0) {
+        String line = Serial.readStringUntil('\n');
+        line.trim();
+
+        if (line.startsWith("G1") || line.startsWith("G0")) {
+            float tX = extractValue(line, 'X', curX);
+            float tY = extractValue(line, 'Y', curY);
+            float tZ = extractValue(line, 'Z', curZ);
+            
+            digitalWrite(STATUS_LED, HIGH);
+            moveAxes(tX, tY, tZ);
+            digitalWrite(STATUS_LED, LOW);
+            
+            Serial.println("ok");
+        }
+    }
+}
+
+void moveAxes(float tx, float ty, float tz) {
+    long sX = abs((tx - curX) * STEPS_PER_MM);
+    long sY = abs((ty - curY) * STEPS_PER_MM);
+    long sZ = abs((tz - curZ) * STEPS_PER_MM);
+
+    digitalWrite(X_DIR, (tx - curX) >= 0 ? HIGH : LOW);
+    digitalWrite(Y_DIR, (ty - curY) >= 0 ? HIGH : LOW);
+    digitalWrite(Z_DIR, (tz - curZ) >= 0 ? HIGH : LOW);
+
+    const int pulseDelay = 5000;
+
+    long maxSteps = max(sX, max(sY, sZ));
+
+    for (long i = 0; i < maxSteps; i++) {
+        if (i < sX) digitalWrite(X_STEP, 1);
+        if (i < sY) digitalWrite(Y_STEP, 1);
+        if (i < sZ) digitalWrite(Z_STEP, 1);
+        
+        delayMicroseconds(pulseDelay);
+
+        if (i < sX) digitalWrite(X_STEP, 0);
+        if (i < sY) digitalWrite(Y_STEP, 0);
+        if (i < sZ) digitalWrite(Z_STEP, 0);
+
+        delayMicroseconds(pulseDelay);
+    }
+
+    curX = tx; curY = ty; curZ = tz;
+}
+
+float extractValue(String g, char c, float defaultValue) {
+    int pos = g.indexOf(c);
+    if (pos == -1) return defaultValue;
+    int endPos = g.indexOf(' ', pos);
+    if (endPos == -1) endPos = g.length();
+    return g.substring(pos + 1, endPos).toFloat();
+}
+    */
+
+
+    /*
+#include <Arduino.h>
+#include <LittleFS.h>
+#include <Shrike.h>
+
+ShrikeFlash fpga;
+
+// --- INTERNAL BRIDGE PINS ---
+const int X_STEP  = 15; 
+const int X_DIR   = 14; 
+const int Y_STEP  = 0;  
+const int Y_DIR   = 3;  
+const int Z_STEP  = 1;  
+const int Z_DIR   = 13; 
+const int RST_PIN = 2; // FPGA Reset
+
+const int STATUS_LED = 25;
+bool flashSuccess = false;
+
+void setup() {
+    Serial.begin(115200);
+    delay(2000);
+    Serial.println("\n--- AUTO-SPIN TEST MODE ---");
+
+    pinMode(STATUS_LED, OUTPUT);
+
+    // 1. Init System
+    if (!LittleFS.begin() || !fpga.begin()) {
+        Serial.println("SYSTEM ERROR: Check hardware/LittleFS.");
+        return;
+    }
+
+    // 2. Flash FPGA
+    if (fpga.flash("/fpga_logic.bin")) {
+        Serial.println("FPGA LOADED. STARTING MOTORS...");
+        flashSuccess = true;
+        
+        // Configure pins
+        pinMode(RST_PIN, OUTPUT);
+        pinMode(X_STEP, OUTPUT); pinMode(X_DIR, OUTPUT);
+        pinMode(Y_STEP, OUTPUT); pinMode(Y_DIR, OUTPUT);
+        pinMode(Z_STEP, OUTPUT); pinMode(Z_DIR, OUTPUT);
+
+        // Set direction to Forward
+        digitalWrite(X_DIR, HIGH);
+        digitalWrite(Y_DIR, HIGH);
+        digitalWrite(Z_DIR, HIGH);
+
+        // Release Reset
+        digitalWrite(RST_PIN, LOW);
+        delay(100);
+        digitalWrite(RST_PIN, HIGH); 
+    } else {
+        Serial.println("FPGA FLASH FAILED.");
+    }
+}
+
+void loop() {
+    // If flashing worked, spin forever at 100Hz
+    if (flashSuccess) {
+        digitalWrite(STATUS_LED, HIGH);
+
+        // Pulse HIGH
+        digitalWrite(X_STEP, HIGH);
+        digitalWrite(Y_STEP, HIGH);
+        digitalWrite(Z_STEP, HIGH);
+        delayMicroseconds(5000); // 5ms
+
+        // Pulse LOW
+        digitalWrite(X_STEP, LOW);
+        digitalWrite(Y_STEP, LOW);
+        digitalWrite(Z_STEP, LOW);
+        delayMicroseconds(5000); // 5ms
+
+        digitalWrite(STATUS_LED, LOW);
+    }
+}
+    */
