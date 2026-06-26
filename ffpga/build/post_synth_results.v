@@ -2,7 +2,7 @@
 
 (* hdlname = "\\cnc_sequencer" *)
 (* top =  1  *)
-(* src = "../src/main.v:1.11-95.10" *)
+(* src = "../src/main.v:1.11-84.10" *)
 module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_step, i_z_dir, o_x_motor, o_y_motor, o_z_motor, o_status_led, o_led_en, o_motor_en);
   wire _00_;
   wire _01_;
@@ -12,88 +12,81 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
   wire _05_;
   (* clkbuf_inhibit = 32'd1 *)
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:2.48-2.53" *)
+  (* src = "../src/main.v:2.52-2.57" *)
   input i_clk;
   wire i_clk;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:3.32-3.37" *)
+  (* src = "../src/main.v:3.36-3.41" *)
   input i_rst;
   wire i_rst;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:6.42-6.49" *)
+  (* src = "../src/main.v:6.46-6.53" *)
   input i_x_dir;
   wire i_x_dir;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:6.32-6.40" *)
+  (* src = "../src/main.v:6.36-6.44" *)
   input i_x_step;
   wire i_x_step;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:7.42-7.49" *)
+  (* src = "../src/main.v:7.46-7.53" *)
   input i_y_dir;
   wire i_y_dir;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:7.32-7.40" *)
+  (* src = "../src/main.v:7.36-7.44" *)
   input i_y_step;
   wire i_y_step;
-  (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:8.42-8.49" *)
+  (* src = "../src/main.v:10.11-10.18" *)
   input i_z_dir;
   wire i_z_dir;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:8.32-8.40" *)
+  (* src = "../src/main.v:9.36-9.44" *)
   input i_z_step;
   wire i_z_step;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:16.33-16.41" *)
+  (* src = "../src/main.v:18.37-18.45" *)
   output o_led_en;
   wire o_led_en;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:17.33-17.43" *)
+  (* src = "../src/main.v:19.37-19.47" *)
   output o_motor_en;
   wire o_motor_en;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:15.33-15.45" *)
+  (* src = "../src/main.v:17.37-17.49" *)
   output o_status_led;
   wire o_status_led;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:11.39-11.48" *)
+  (* src = "../src/main.v:13.43-13.52" *)
   output [3:0] o_x_motor;
   wire [3:0] o_x_motor;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:12.39-12.48" *)
+  (* src = "../src/main.v:14.43-14.52" *)
   output [3:0] o_y_motor;
   wire [3:0] o_y_motor;
   (* iopad_external_pin = 32'd1 *)
-  (* src = "../src/main.v:13.39-13.48" *)
+  (* src = "../src/main.v:15.43-15.52" *)
   output [3:0] o_z_motor;
   wire [3:0] o_z_motor;
   (* nosync = 32'd1 *)
-  (* src = "../src/main.v:32.41-32.46" *)
-  wire [1:0] \step_pattern$func$../src/main.v:91$1100.phase ;
+  (* src = "../src/main.v:66.45-66.50" *)
+  wire [1:0] \step_pattern$func$../src/main.v:77$1100.phase ;
   (* nosync = 32'd1 *)
-  (* src = "../src/main.v:32.41-32.46" *)
-  wire [1:0] \step_pattern$func$../src/main.v:92$1101.phase ;
+  (* src = "../src/main.v:66.45-66.50" *)
+  wire [1:0] \step_pattern$func$../src/main.v:78$1101.phase ;
   (* nosync = 32'd1 *)
-  (* src = "../src/main.v:32.41-32.46" *)
-  wire [1:0] \step_pattern$func$../src/main.v:93$1102.phase ;
-  (* src = "../src/main.v:25.24-25.34" *)
-  wire [1:0] x_dir_sync;
-  (* src = "../src/main.v:29.11-29.18" *)
+  (* src = "../src/main.v:66.45-66.50" *)
+  wire [1:0] \step_pattern$func$../src/main.v:79$1102.phase ;
+  (* src = "../src/main.v:30.15-30.22" *)
   wire [1:0] x_phase;
-  (* src = "../src/main.v:25.11-25.22" *)
-  wire [1:0] x_step_sync;
-  (* src = "../src/main.v:26.24-26.34" *)
-  wire [1:0] y_dir_sync;
-  (* src = "../src/main.v:29.20-29.27" *)
+  (* src = "../src/main.v:29.15-29.21" *)
+  wire [2:0] x_sync;
+  (* src = "../src/main.v:30.24-30.31" *)
   wire [1:0] y_phase;
-  (* src = "../src/main.v:26.11-26.22" *)
-  wire [1:0] y_step_sync;
-  (* src = "../src/main.v:27.24-27.34" *)
-  wire [1:0] z_dir_sync;
-  (* src = "../src/main.v:29.29-29.36" *)
+  (* src = "../src/main.v:29.23-29.29" *)
+  wire [2:0] y_sync;
+  (* src = "../src/main.v:30.33-30.40" *)
   wire [1:0] z_phase;
-  (* src = "../src/main.v:27.11-27.22" *)
-  wire [1:0] z_step_sync;
+  (* src = "../src/main.v:29.31-29.37" *)
+  wire [2:0] z_sync;
   (* module_not_derived = 32'd1 *)
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:43.26-44.30" *)
   LUT2 #(
@@ -203,142 +196,109 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .O(o_z_motor[3])
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _18_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(i_z_dir),
-    .Q(z_dir_sync[0]),
+    .D(i_z_step),
+    .Q(z_sync[0]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _19_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(z_dir_sync[0]),
-    .Q(z_dir_sync[1]),
+    .D(z_sync[0]),
+    .Q(z_sync[1]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _20_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(i_x_step),
-    .Q(x_step_sync[0]),
+    .D(z_sync[1]),
+    .Q(z_sync[2]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _21_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(x_step_sync[0]),
-    .Q(x_step_sync[1]),
+    .D(i_x_step),
+    .Q(x_sync[0]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _22_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(i_x_dir),
-    .Q(x_dir_sync[0]),
+    .D(x_sync[0]),
+    .Q(o_status_led),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _23_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(x_dir_sync[0]),
-    .Q(x_dir_sync[1]),
+    .D(o_status_led),
+    .Q(x_sync[2]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _24_ (
     .C(i_clk),
     .CE(1'h1),
     .D(i_y_step),
-    .Q(y_step_sync[0]),
+    .Q(y_sync[0]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _25_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(y_step_sync[0]),
-    .Q(y_step_sync[1]),
+    .D(y_sync[0]),
+    .Q(y_sync[1]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _26_ (
     .C(i_clk),
     .CE(1'h1),
-    .D(i_y_dir),
-    .Q(y_dir_sync[0]),
+    .D(y_sync[1]),
+    .Q(y_sync[2]),
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
   ) _27_ (
-    .C(i_clk),
-    .CE(1'h1),
-    .D(y_dir_sync[0]),
-    .Q(y_dir_sync[1]),
-    .R(i_rst)
-  );
-  (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
-  FDRE #(
-    .INIT(1'hx)
-  ) _28_ (
-    .C(i_clk),
-    .CE(1'h1),
-    .D(i_z_step),
-    .Q(z_step_sync[0]),
-    .R(i_rst)
-  );
-  (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
-  FDRE #(
-    .INIT(1'hx)
-  ) _29_ (
-    .C(i_clk),
-    .CE(1'h1),
-    .D(z_step_sync[0]),
-    .Q(z_step_sync[1]),
-    .R(i_rst)
-  );
-  (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
-  FDRE #(
-    .INIT(1'hx)
-  ) _30_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_00_),
@@ -346,10 +306,10 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
-  ) _31_ (
+  ) _28_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_01_),
@@ -357,10 +317,10 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
-  ) _32_ (
+  ) _29_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_02_),
@@ -368,10 +328,10 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
-  ) _33_ (
+  ) _30_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_03_),
@@ -379,10 +339,10 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
-  ) _34_ (
+  ) _31_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_04_),
@@ -390,10 +350,10 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
     .R(i_rst)
   );
   (* module_not_derived = 32'd1 *)
-  (* src = "../src/main.v:41.1-89.4|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
+  (* src = "../src/main.v:32.5-61.8|C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/ff_map.v:68.41-68.95" *)
   FDRE #(
     .INIT(1'hx)
-  ) _35_ (
+  ) _32_ (
     .C(i_clk),
     .CE(1'h1),
     .D(_05_),
@@ -404,9 +364,9 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:36.13-36.48" *)
   LUT3 #(
     .INIT(8'hd2)
-  ) _36_ (
-    .I0(x_step_sync[0]),
-    .I1(x_step_sync[1]),
+  ) _33_ (
+    .I0(o_status_led),
+    .I1(x_sync[2]),
     .I2(x_phase[0]),
     .O(_00_)
   );
@@ -414,9 +374,9 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:36.13-36.48" *)
   LUT3 #(
     .INIT(8'hd2)
-  ) _37_ (
-    .I0(y_step_sync[0]),
-    .I1(y_step_sync[1]),
+  ) _34_ (
+    .I0(y_sync[1]),
+    .I1(y_sync[2]),
     .I2(y_phase[0]),
     .O(_02_)
   );
@@ -424,52 +384,52 @@ module cnc_sequencer(i_clk, i_rst, i_x_step, i_x_dir, i_y_step, i_y_dir, i_z_ste
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:36.13-36.48" *)
   LUT3 #(
     .INIT(8'hd2)
-  ) _38_ (
-    .I0(z_step_sync[0]),
-    .I1(z_step_sync[1]),
+  ) _35_ (
+    .I0(z_sync[1]),
+    .I1(z_sync[2]),
     .I2(z_phase[0]),
     .O(_04_)
   );
   (* module_not_derived = 32'd1 *)
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:47.26-48.41" *)
   LUT5 #(
-    .INIT(32'd4040348400)
-  ) _39_ (
-    .I0(x_step_sync[0]),
-    .I1(x_step_sync[1]),
-    .I2(x_phase[1]),
-    .I3(x_dir_sync[1]),
+    .INIT(32'd4244823840)
+  ) _36_ (
+    .I0(o_status_led),
+    .I1(x_sync[2]),
+    .I2(i_x_dir),
+    .I3(x_phase[1]),
     .I4(x_phase[0]),
     .O(_01_)
   );
   (* module_not_derived = 32'd1 *)
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:47.26-48.41" *)
   LUT5 #(
-    .INIT(32'd4040348400)
-  ) _40_ (
-    .I0(y_step_sync[0]),
-    .I1(y_step_sync[1]),
-    .I2(y_phase[1]),
-    .I3(y_dir_sync[1]),
+    .INIT(32'd4244823840)
+  ) _37_ (
+    .I0(y_sync[1]),
+    .I1(y_sync[2]),
+    .I2(i_y_dir),
+    .I3(y_phase[1]),
     .I4(y_phase[0]),
     .O(_03_)
   );
   (* module_not_derived = 32'd1 *)
   (* src = "C:\\PROGRA~1\\RENESA~1\\GOCONF~1\\external\\yosys\\share\\xilinx/lut_map.v:47.26-48.41" *)
   LUT5 #(
-    .INIT(32'd4040348400)
-  ) _41_ (
-    .I0(z_step_sync[0]),
-    .I1(z_step_sync[1]),
-    .I2(z_phase[1]),
-    .I3(z_dir_sync[1]),
+    .INIT(32'd4244823840)
+  ) _38_ (
+    .I0(z_sync[1]),
+    .I1(z_sync[2]),
+    .I2(i_z_dir),
+    .I3(z_phase[1]),
     .I4(z_phase[0]),
     .O(_05_)
   );
   assign o_led_en = 1'h1;
   assign o_motor_en = 1'h1;
-  assign o_status_led = 1'h1;
-  assign \step_pattern$func$../src/main.v:91$1100.phase  = 2'hx;
-  assign \step_pattern$func$../src/main.v:92$1101.phase  = 2'hx;
-  assign \step_pattern$func$../src/main.v:93$1102.phase  = 2'hx;
+  assign \step_pattern$func$../src/main.v:77$1100.phase  = 2'hx;
+  assign \step_pattern$func$../src/main.v:78$1101.phase  = 2'hx;
+  assign \step_pattern$func$../src/main.v:79$1102.phase  = 2'hx;
+  assign x_sync[1] = o_status_led;
 endmodule

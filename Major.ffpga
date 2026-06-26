@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GPDProject version="40" oldestCompatibleVersion="32" GPDVersion="6.52.001" lastChange="20 Apr 2026 18:58:40" projectChecksumState="1" projectChecksum="70f8c3a7">
+<GPDProject version="40" oldestCompatibleVersion="32" GPDVersion="6.52.001" lastChange="26 Jun 2026 23:46:39" projectChecksumState="1" projectChecksum="ee6a0a23">
     <generalProjectSettings/>
     <chip family="04" type="06" friendlyName="FFPGA" partNumber="67" package="26">
-        <nvmData registerLenght="480">0 0 0 28 0 0 0 0 A5 A5 A5 A5 0 0 0 0 0 0 0 0 5A 5A 5A 5A 0 0 0 0 22 22 22 22 22 22 22 22 22 22 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</nvmData>
-        <checksum crc32="0x451C1D42" version="2"/>
+        <nvmData registerLenght="480">0 0 0 28 0 0 0 0 A5 A5 A5 A5 0 0 0 0 0 0 0 0 5A 5A 5A 5A 0 0 0 0 22 22 22 22 22 22 22 22 22 22 2 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</nvmData>
+        <checksum crc32="0x44DE7775" version="2"/>
         <virtualProperties/>
         <VDDItem id="0">
             <item id="0" caption="VDDC (PIN 22)">
@@ -662,7 +662,7 @@
             </pipelineStageState>
             <pipelineStageState>
                 <pipelineStage>1</pipelineStage>
-                <pipelineState>0</pipelineState>
+                <pipelineState>3</pipelineState>
             </pipelineStageState>
         </pipelineStagesStates>
         <modules>
@@ -677,15 +677,15 @@
             <placement-constraints/>
         </modules>
         <io-spec-tool>
-            <records filter="18">
+            <records filter="34">
                 <record id="CLK_t[0:0]_W_in0">
                     <port-name>i_clk</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[0:10]_in0">
-                    <port-name>i_x_dir</port-name>
+                    <port-name>i_x_step</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[0:22]_in0">
-                    <port-name>i_x_step</port-name>
+                    <port-name>i_x_dir</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[0:23]_out0">
                     <port-name>o_x_motor[3]</port-name>
@@ -696,20 +696,20 @@
                 <record id="IOB_t[0:0]_xy[0:6]_out0">
                     <port-name>o_z_motor[3]</port-name>
                 </record>
-                <record id="IOB_t[0:0]_xy[0:7]_in0">
-                    <port-name>i_y_step</port-name>
-                </record>
-                <record id="IOB_t[0:0]_xy[0:8]_in0">
-                    <port-name>i_y_dir</port-name>
-                </record>
-                <record id="IOB_t[0:0]_xy[0:9]_in0">
-                    <port-name>i_rst</port-name>
-                </record>
-                <record id="IOB_t[0:0]_xy[0:9]_out0">
+                <record id="IOB_t[0:0]_xy[0:7]_out0">
                     <port-name>o_z_motor[2]</port-name>
                 </record>
-                <record id="IOB_t[0:0]_xy[31:22]_out0">
+                <record id="IOB_t[0:0]_xy[0:8]_out0">
+                    <port-name>o_status_led</port-name>
+                </record>
+                <record id="IOB_t[0:0]_xy[0:9]_out0">
                     <port-name>o_z_motor[1]</port-name>
+                </record>
+                <record id="IOB_t[0:0]_xy[31:22]_in0">
+                    <port-name>i_z_step</port-name>
+                </record>
+                <record id="IOB_t[0:0]_xy[31:23]_in0">
+                    <port-name>i_rst</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[31:24]_out0">
                     <port-name>o_z_motor[0]</port-name>
@@ -733,10 +733,10 @@
                     <port-name>o_x_motor[0]</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[31:8]_in0">
-                    <port-name>i_z_step</port-name>
+                    <port-name>i_y_step</port-name>
                 </record>
                 <record id="IOB_t[0:0]_xy[31:9]_in0">
-                    <port-name>i_z_dir</port-name>
+                    <port-name>i_y_dir</port-name>
                 </record>
             </records>
         </io-spec-tool>
