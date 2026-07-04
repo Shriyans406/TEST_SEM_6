@@ -250,14 +250,14 @@ delayMicroseconds(2000); digitalWrite(Z_STEP, 0); delayMicroseconds(2000); }
 
 ShrikeFlash fpga;
 
-// --- PIN MAPPING ---
-const int X_STEP  = 15;
-const int X_DIR   = 14;
-const int Y_STEP  = 0;
-const int Y_DIR   = 3;
-const int Z_STEP  = 1;
-const int Z_DIR   = 13;
-const int RST_PIN = 2;
+// --- PIN MAPPING (Current FPGA Bitstream Setup) ---
+const int X_STEP  = 15; // Directly bridged to FPGA F4 (i_x_step)
+const int X_DIR   = 14; // Directly bridged to FPGA F5 (i_x_dir)
+const int Y_STEP  = 4;  // Jumper wire GP4 -> F8 (i_y_step)
+const int Y_DIR   = 5;  // Jumper wire GP5 -> F9 (i_y_dir)
+const int Z_STEP  = 6;  // Jumper wire GP6 -> F10 (i_z_step)
+const int Z_DIR   = 13; // Unused (internally tied in FPGA)
+const int RST_PIN = 7;  // Jumper wire GP7 -> F11 (i_rst)
 
 const int STATUS_LED = 25;
 
@@ -323,6 +323,12 @@ void setup() {
     pinMode(Y_STEP, OUTPUT); pinMode(Y_DIR, OUTPUT);
     pinMode(Z_STEP, OUTPUT); pinMode(Z_DIR, OUTPUT);
 
+    // Ensure unused bridged pins (which are FPGA outputs) are placed in high-impedance INPUT mode to prevent driver fights
+    pinMode(0, INPUT);
+    pinMode(1, INPUT);
+    pinMode(2, INPUT);
+    pinMode(3, INPUT);
+
     // =========================
     digitalWrite(RST_PIN, HIGH);
     delay(100);
@@ -342,7 +348,7 @@ void setup() {
     digitalWrite(Y_STEP, LOW);
     digitalWrite(Z_STEP, LOW);
 
-    Serial.println("If LEDs blink → FPGA is working");
+    Serial.println("If LEDs blink -> FPGA is working");
 
     digitalWrite(STATUS_LED, LOW);
     Serial.println("SYSTEM READY: Send G1 X.. Y.. Z..");
@@ -358,6 +364,10 @@ void loop() {
             float tY = extractValue(line, 'Y', curY);
             float tZ = extractValue(line, 'Z', curZ);
 
+            Serial.print("Target -> X:"); Serial.print(tX);
+            Serial.print(" Y:"); Serial.print(tY);
+            Serial.print(" Z:"); Serial.println(tZ);
+
             digitalWrite(STATUS_LED, HIGH);
             moveAxes(tX, tY, tZ);
             digitalWrite(STATUS_LED, LOW);
@@ -371,6 +381,10 @@ void moveAxes(float tx, float ty, float tz) {
     long sX = abs((tx - curX) * STEPS_PER_MM);
     long sY = abs((ty - curY) * STEPS_PER_MM);
     long sZ = abs((tz - curZ) * STEPS_PER_MM);
+
+    Serial.print("Pulses -> X:"); Serial.print(sX);
+    Serial.print(" Y:"); Serial.print(sY);
+    Serial.print(" Z:"); Serial.println(sZ);
 
     digitalWrite(X_DIR, (tx - curX) >= 0 ? HIGH : LOW);
     digitalWrite(Y_DIR, (ty - curY) >= 0 ? HIGH : LOW);
