@@ -3,10 +3,10 @@
 #include <math.h>
 
 // --- PIN MAPPING (4-Wire ULN2003 Setup) --- MCU ONLY, no FPGA ---
-// X-Axis
-const int x_pins[] = {16, 17, 18, 6};
-// Y-Axis (Adjust these based on your physical wiring)
-const int y_pins[] = {7, 8, 9, 10};
+// X-Axis (verified live: was driving Y motor, swapped 2026-09-23)
+const int x_pins[] = {7, 8, 9, 10};
+// Y-Axis (verified live: was driving X motor, swapped 2026-09-23)
+const int y_pins[] = {16, 17, 18, 6};
 // Z-Axis
 const int z_pins[] = {11, 14, 15, 19};
 
