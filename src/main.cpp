@@ -1,111 +1,348 @@
-/*
-#include <Arduino.h>
 
-// --- PIN MAPPING (4-Wire ULN2003 Setup) ---
+#include <Arduino.h>
+#include <math.h>
+
+// --- PIN MAPPING (4-Wire ULN2003 Setup) --- MCU ONLY, no FPGA ---
 // X-Axis
-const int x_pins[] = {5, 6, 7, 8};
+const int x_pins[] = {16, 17, 18, 6};
 // Y-Axis (Adjust these based on your physical wiring)
-const int y_pins[] = {10, 11, 14, 15};
+const int y_pins[] = {7, 8, 9, 10};
 // Z-Axis
-const int z_pins[] = {21, 22, 23, 24};
+const int z_pins[] = {11, 14, 15, 19};
 
 const int STATUS_LED = 25; // Internal RP2040 LED
 
+// NOTE: calibrate this. 28BYJ-48 in half-step = 4096 steps/rev.
+// Example: M8 leadscrew 1.25mm pitch -> 4096/1.25 = 3276.8 steps/mm.
+// Keep 256.0 only if your mechanics were tuned for it.
 const float STEPS_PER_MM = 256.0;
 float curX = 0, curY = 0, curZ = 0;
 
-// The 4-step sequence for ULN2003 (Wave Drive)
-const int step_seq[4][4] = {
-  {1, 0, 0, 0},
-  {0, 1, 0, 0},
-  {0, 0, 1, 0},
-  {0, 0, 0, 1}
-};
+// Grbl-subset state
+bool absMode = true;        // G90 absolute, G91 incremental
+float unitScale = 1.0f;     // G21 mm (1.0), G20 inch (25.4)
+long stepDelayUs = 3500;    // default safe speed for 28BYJ-48 + ULN2003
+bool penDown = false;
+
+// 8-step half-step sequence for 28BYJ-48 + ULN2003.
+// Much smoother + more torque than 4-step wave drive.
+// If a motor only vibrates, its 4 wires are in wrong order: swap middle two.
+const int step_seq[8][4] = {
+    {1, 0, 0, 0},
+    {1, 1, 0, 0},
+    {0, 1, 0, 0},
+    {0, 1, 1, 0},
+    {0, 0, 1, 0},
+    {0, 0, 1, 1},
+    {0, 0, 0, 1},
+    {1, 0, 0, 1}};
 
 int x_step_idx = 0;
 int y_step_idx = 0;
 int z_step_idx = 0;
 
 void stepMotor(const int pins[], int &idx, bool forward) {
-    if (forward) idx = (idx + 1) % 4;
-    else idx = (idx + 3) % 4; // Move backward
+  if (forward)
+    idx = (idx + 1) % 8;
+  else
+    idx = (idx + 7) % 8; // Move backward
+  for (int i = 0; i < 4; i++) {
+    digitalWrite(pins[i], step_seq[idx][i]);
+  }
+}
 
-    for (int i = 0; i < 4; i++) {
-        digitalWrite(pins[i], step_seq[idx][i]);
-    }
+void releaseMotors() {
+  for (int i = 0; i < 4; i++) {
+    digitalWrite(x_pins[i], LOW);
+    digitalWrite(y_pins[i], LOW);
+    digitalWrite(z_pins[i], LOW);
+  }
 }
 
 float extractValue(String g, char c, float defaultValue);
+bool hasWord(String g, char c);
 void moveAxes(float tx, float ty, float tz);
+void moveArc(float tx, float ty, float iOff, float jOff, bool clockwise);
+void handleLine(String line);
 
 void setup() {
-    Serial.begin(115200);
-    delay(2000);
-    Serial.println("\n--- MCU DIRECT CONTROL: PLOTTER READY ---");
+  Serial.begin(115200);
+  Serial.setTimeout(10); // avoid 1s block on readStringUntil
+  delay(2000);
+  // Grbl-style banner helps DesignWebCAD / UGS / Candle stream correctly
+  Serial.println("Grbl 1.1h ['$' for help]");
+  Serial.println("--- MCU DIRECT CONTROL: PLOTTER READY ---");
+  Serial.println("ok");
 
-    pinMode(STATUS_LED, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
 
-    for(int i=0; i<4; i++) {
-        pinMode(x_pins[i], OUTPUT);
-        pinMode(y_pins[i], OUTPUT);
-        pinMode(z_pins[i], OUTPUT);
-    }
+  for (int i = 0; i < 4; i++) {
+    pinMode(x_pins[i], OUTPUT);
+    digitalWrite(x_pins[i], LOW);
+    pinMode(y_pins[i], OUTPUT);
+    digitalWrite(y_pins[i], LOW);
+    pinMode(z_pins[i], OUTPUT);
+    digitalWrite(z_pins[i], LOW);
+  }
 }
 
 void loop() {
-    if (Serial.available() > 0) {
-        String line = Serial.readStringUntil('\n');
-        line.trim();
+  if (Serial.available() > 0) {
+    String line = Serial.readStringUntil('\n');
+    line.trim();
+    if (line.length() == 0) return;
+    handleLine(line);
+  }
+}
 
-        if (line.startsWith("G1") || line.startsWith("G0")) {
-            float tX = extractValue(line, 'X', curX);
-            float tY = extractValue(line, 'Y', curY);
-            float tZ = extractValue(line, 'Z', curZ);
+// Strip comments, uppercase, parse Grbl subset. ALWAYS answers "ok"
+// so the sender never stalls waiting for acknowledgement.
+void handleLine(String line) {
+  // Strip ';' comment
+  int semi = line.indexOf(';');
+  if (semi >= 0) line = line.substring(0, semi);
+  // Strip '(' ... ')' comments
+  while (true) {
+    int a = line.indexOf('(');
+    int b = line.indexOf(')', a);
+    if (a < 0) break;
+    if (b < 0) { line = line.substring(0, a); break; }
+    line = line.substring(0, a) + " " + line.substring(b + 1);
+  }
+  line.trim();
+  line.toUpperCase();
+  if (line.length() == 0) { Serial.println("ok"); return; }
 
-            digitalWrite(STATUS_LED, HIGH);
-            moveAxes(tX, tY, tZ);
-            digitalWrite(STATUS_LED, LOW);
+  // Status / reset helpers
+  if (line == "?" || line == "$" || line == "$$" || line == "$G" ||
+      line == "$I" || line == "$N" || line == "$C" || line == "$X") {
+    Serial.print("[G90:"); Serial.print(absMode ? "ABS" : "INC");
+    Serial.print(" G"); Serial.print(unitScale > 1.5f ? "20" : "21");
+    Serial.print(" X:"); Serial.print(curX, 3);
+    Serial.print(" Y:"); Serial.print(curY, 3);
+    Serial.print(" Z:"); Serial.print(curZ, 3);
+    Serial.println("]");
+    Serial.println("ok");
+    return;
+  }
+  if (line == "!" || line == "~" || line == "\x18") { Serial.println("ok"); return; }
 
-            Serial.println("ok");
-        }
+  // Feedrate: F<number> anywhere -> step speed (mm/min -> us/step)
+  if (hasWord(line, 'F')) {
+    float f = extractValue(line, 'F', -1);
+    if (f > 1) {
+      // steps/sec = F(mm/min)/60 * STEPS_PER_MM ; clamp to motor limits
+      float stepsPerSec = (f / 60.0f) * STEPS_PER_MM;
+      if (stepsPerSec < 20) stepsPerSec = 20;
+      if (stepsPerSec > 900) stepsPerSec = 900; // 28BYJ-48 safe ceiling
+      stepDelayUs = (long)(1000000.0f / stepsPerSec);
     }
+  }
+
+  // Units / distance mode (may appear alongside motion, apply first)
+  if (line.indexOf("G20") >= 0) unitScale = 25.4f;
+  if (line.indexOf("G21") >= 0) unitScale = 1.0f;
+  if (line.indexOf("G90") >= 0) absMode = true;
+  if (line.indexOf("G91") >= 0) absMode = false;
+
+  // Dwell G4 P<sec> / X<sec>
+  if (line.startsWith("G4") || line.indexOf("G04") == 0) {
+    float p = hasWord(line, 'P') ? extractValue(line, 'P', 0) : extractValue(line, 'X', 0);
+    if (p > 0 && p < 60) delay((unsigned long)(p * 1000));
+    Serial.println("ok");
+    return;
+  }
+
+  // Set position G92 X.. Y.. Z..
+  if (line.startsWith("G92")) {
+    if (hasWord(line, 'X')) curX = extractValue(line, 'X', curX) * unitScale;
+    if (hasWord(line, 'Y')) curY = extractValue(line, 'Y', curY) * unitScale;
+    if (hasWord(line, 'Z')) curZ = extractValue(line, 'Z', curZ) * unitScale;
+    Serial.println("ok");
+    return;
+  }
+  // Homing G28 / G30 -> treat as go to 0,0,0 for pen plotter without endstops
+  if (line.startsWith("G28") || line.startsWith("G30")) {
+    float tx = hasWord(line, 'X') ? extractValue(line, 'X', 0) * unitScale : 0;
+    float ty = hasWord(line, 'Y') ? extractValue(line, 'Y', 0) * unitScale : 0;
+    float tz = hasWord(line, 'Z') ? extractValue(line, 'Z', 0) * unitScale : curZ;
+    if (!absMode && !hasWord(line, 'X') && !hasWord(line, 'Y') && !hasWord(line, 'Z')) {
+      tx = 0; ty = 0; // plain G28 in relative = go home
+    }
+    digitalWrite(STATUS_LED, HIGH);
+    moveAxes(tx, ty, tz);
+    digitalWrite(STATUS_LED, LOW);
+    Serial.println("ok");
+    return;
+  }
+
+  // Arcs G2/G3 (must check before G0/G1 because "G02" starts with "G0")
+  if (line.startsWith("G2") || line.startsWith("G3") || line.startsWith("G02") || line.startsWith("G03")) {
+    bool cw = line.startsWith("G2") || line.startsWith("G02");
+    float rawX = hasWord(line, 'X') ? extractValue(line, 'X', 0) : (absMode ? curX / unitScale : 0);
+    float rawY = hasWord(line, 'Y') ? extractValue(line, 'Y', 0) : (absMode ? curY / unitScale : 0);
+    float tx = absMode ? rawX * unitScale : curX + rawX * unitScale;
+    float ty = absMode ? rawY * unitScale : curY + rawY * unitScale;
+    float iOff = hasWord(line, 'I') ? extractValue(line, 'I', 0) * unitScale : 0;
+    float jOff = hasWord(line, 'J') ? extractValue(line, 'J', 0) * unitScale : 0;
+    // R-format arcs: convert R to I/J approx is complex; fall back to linear
+    if (hasWord(line, 'R')) {
+      float tz = hasWord(line, 'Z') ? extractValue(line, 'Z', 0) * unitScale : curZ;
+      float az = absMode ? tz : curZ + (tz - 0) * 0 + (hasWord(line, 'Z') ? (extractValue(line, 'Z', 0) * unitScale - (absMode ? 0 : curZ)) : 0);
+      // simple: linear move to target when R given
+      float lz = hasWord(line, 'Z') ? (absMode ? extractValue(line, 'Z', 0) * unitScale : curZ + extractValue(line, 'Z', 0) * unitScale) : curZ;
+      digitalWrite(STATUS_LED, HIGH);
+      moveAxes(tx, ty, lz);
+      digitalWrite(STATUS_LED, LOW);
+      (void)az;
+    } else {
+      digitalWrite(STATUS_LED, HIGH);
+      moveArc(tx, ty, iOff, jOff, cw);
+      digitalWrite(STATUS_LED, LOW);
+    }
+    Serial.println("ok");
+    return;
+  }
+
+  // Linear G0/G1 (also accept G00/G01). G00 must not be mistaken for G02/G03 (handled above).
+  if (line.startsWith("G0") || line.startsWith("G1") || line == "G" || line.startsWith("G ") ||
+      line.startsWith("X") || line.startsWith("Y") || line.startsWith("Z") || line.startsWith("F")) {
+    float tx = curX, ty = curY, tz = curZ;
+    if (hasWord(line, 'X')) {
+      float v = extractValue(line, 'X', 0) * unitScale;
+      tx = absMode ? v : curX + v;
+    }
+    if (hasWord(line, 'Y')) {
+      float v = extractValue(line, 'Y', 0) * unitScale;
+      ty = absMode ? v : curY + v;
+    }
+    if (hasWord(line, 'Z')) {
+      float v = extractValue(line, 'Z', 0) * unitScale;
+      tz = absMode ? v : curZ + v;
+    }
+    digitalWrite(STATUS_LED, HIGH);
+    moveAxes(tx, ty, tz);
+    digitalWrite(STATUS_LED, LOW);
+    Serial.println("ok");
+    return;
+  }
+
+  // Spindle/laser/pen M3/M4/M5 S... (many CADs use these for pen up/down)
+  if (line.startsWith("M3") || line.startsWith("M4") || line.startsWith("M5") ||
+      line.startsWith("M2") || line.startsWith("M30") || line.startsWith("M17") ||
+      line.startsWith("M18") || line.startsWith("M84") || line.startsWith("M114") ||
+      line.startsWith("G17") || line.startsWith("G54") || line.startsWith("G94") ||
+      line.startsWith("M6") || line.startsWith("M7") || line.startsWith("M8") ||
+      line.startsWith("M9") || line.startsWith("T") || line.startsWith("$") ||
+      line.startsWith("G40") || line.startsWith("G41") || line.startsWith("G42") ||
+      line.startsWith("G49") || line.startsWith("G61") || line.startsWith("G64")) {
+    if (line.startsWith("M3") || line.startsWith("M4")) penDown = true;
+    if (line.startsWith("M5")) penDown = false;
+    if (line.startsWith("M18") || line.startsWith("M84")) releaseMotors();
+    if (line.startsWith("M114")) {
+      Serial.print("X:"); Serial.print(curX, 3);
+      Serial.print(" Y:"); Serial.print(curY, 3);
+      Serial.print(" Z:"); Serial.println(curZ, 3);
+    }
+    Serial.println("ok");
+    return;
+  }
+
+  // Anything else (G21/G90 alone, comments, unknown): acknowledge so stream continues
+  Serial.println("ok");
+}
+
+bool hasWord(String g, char c) {
+  int pos = g.indexOf(c);
+  if (pos == -1) return false;
+  // next char should be digit, '.', '-' or '+' (avoids matching 'G' inside other text)
+  if (pos + 1 >= (int)g.length()) return false;
+  char n = g.charAt(pos + 1);
+  return (n == '-' || n == '+' || n == '.' || (n >= '0' && n <= '9'));
 }
 
 float extractValue(String g, char c, float defaultValue) {
-    int pos = g.indexOf(c);
-    if (pos == -1) return defaultValue;
-    int endPos = g.indexOf(' ', pos);
-    if (endPos == -1) endPos = g.length();
-    return g.substring(pos + 1, endPos).toFloat();
+  int pos = g.indexOf(c);
+  if (pos == -1) return defaultValue;
+  int i = pos + 1;
+  // skip spaces between letter and number ("X 10.5")
+  while (i < (int)g.length() && g.charAt(i) == ' ') i++;
+  int j = i;
+  // optional sign
+  if (j < (int)g.length() && (g.charAt(j) == '-' || g.charAt(j) == '+')) j++;
+  bool dotSeen = false;
+  while (j < (int)g.length()) {
+    char ch = g.charAt(j);
+    if (ch >= '0' && ch <= '9') { j++; continue; }
+    if (ch == '.' && !dotSeen) { dotSeen = true; j++; continue; }
+    break;
+  }
+  if (j == i) return defaultValue;
+  return g.substring(i, j).toFloat();
 }
 
+// True coordinated motion: Bresenham interleaves X/Y/Z so the tool
+// travels a straight line. Old code finished the short axis first
+// (dogleg), which turned shapes into broken lines.
 void moveAxes(float tx, float ty, float tz) {
-    long sX = abs((tx - curX) * STEPS_PER_MM);
-    long sY = abs((ty - curY) * STEPS_PER_MM);
-    long sZ = abs((tz - curZ) * STEPS_PER_MM);
+  long sX = lroundf(fabsf((tx - curX) * STEPS_PER_MM));
+  long sY = lroundf(fabsf((ty - curY) * STEPS_PER_MM));
+  long sZ = lroundf(fabsf((tz - curZ) * STEPS_PER_MM));
 
-    bool dirX = (tx - curX) >= 0;
-    bool dirY = (ty - curY) >= 0;
-    bool dirZ = (tz - curZ) >= 0;
+  bool dirX = (tx - curX) >= 0;
+  bool dirY = (ty - curY) >= 0;
+  bool dirZ = (tz - curZ) >= 0;
 
-    // Find the max steps to synchronize the movement timing
-    long maxSteps = max(sX, max(sY, sZ));
+  long maxSteps = sX;
+  if (sY > maxSteps) maxSteps = sY;
+  if (sZ > maxSteps) maxSteps = sZ;
+  if (maxSteps == 0) { curX = tx; curY = ty; curZ = tz; return; }
 
-    for (long i = 0; i < maxSteps; i++) {
-        if (i < sX) stepMotor(x_pins, x_step_idx, dirX);
-        if (i < sY) stepMotor(y_pins, y_step_idx, dirY);
-        if (i < sZ) stepMotor(z_pins, z_step_idx, dirZ);
+  long errX = maxSteps / 2;
+  long errY = maxSteps / 2;
+  long errZ = maxSteps / 2;
 
-        delayMicroseconds(2000); // Control speed here
-    }
+  for (long i = 0; i < maxSteps; i++) {
+    errX += sX;
+    if (errX >= maxSteps) { errX -= maxSteps; stepMotor(x_pins, x_step_idx, dirX); }
+    errY += sY;
+    if (errY >= maxSteps) { errY -= maxSteps; stepMotor(y_pins, y_step_idx, dirY); }
+    errZ += sZ;
+    if (errZ >= maxSteps) { errZ -= maxSteps; stepMotor(z_pins, z_step_idx, dirZ); }
+    delayMicroseconds((unsigned int)stepDelayUs);
+  }
 
-    curX = tx; curY = ty; curZ = tz;
+  curX = tx;
+  curY = ty;
+  curZ = tz;
 }
 
-
-
-
-*/
+// Arc interpolation: split G2/G3 into short linear segments (~0.5mm)
+void moveArc(float tx, float ty, float iOff, float jOff, bool clockwise) {
+  float cx = curX + iOff;
+  float cy = curY + jOff;
+  float r = sqrtf(iOff * iOff + jOff * jOff);
+  if (r < 0.0001f) { moveAxes(tx, ty, curZ); return; }
+  float a0 = atan2f(curY - cy, curX - cx);
+  float a1 = atan2f(ty - cy, tx - cx);
+  float sweep;
+  if (clockwise) {
+    sweep = a0 - a1;
+    while (sweep <= 0) sweep += 2 * PI;
+  } else {
+    sweep = a1 - a0;
+    while (sweep <= 0) sweep += 2 * PI;
+  }
+  float arcLen = fabsf(sweep) * r;
+  int segs = (int)ceilf(arcLen / 0.5f);
+  if (segs < 4) segs = 4;
+  if (segs > 400) segs = 400; // cap serial blocking time
+  for (int s = 1; s <= segs; s++) {
+    float a = clockwise ? (a0 - sweep * s / segs) : (a0 + sweep * s / segs);
+    moveAxes(cx + r * cosf(a), cy + r * sinf(a), curZ);
+  }
+  moveAxes(tx, ty, curZ); // snap to exact endpoint
+}
 
 // main code
 /*
@@ -243,7 +480,7 @@ delayMicroseconds(2000); digitalWrite(Z_STEP, 0); delayMicroseconds(2000); }
 }
 
 */
-
+/*
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <Shrike.h>
@@ -323,11 +560,9 @@ void setup() {
     pinMode(Y_STEP, OUTPUT); pinMode(Y_DIR, OUTPUT);
     pinMode(Z_STEP, OUTPUT); pinMode(Z_DIR, OUTPUT);
 
-    // Ensure unused bridged pins (which are FPGA outputs) are placed in high-impedance INPUT mode to prevent driver fights
-    pinMode(0, INPUT);
-    pinMode(1, INPUT);
-    pinMode(2, INPUT);
-    pinMode(3, INPUT);
+    // Ensure unused bridged pins (which are FPGA outputs) are placed in
+high-impedance INPUT mode to prevent driver fights pinMode(0, INPUT); pinMode(1,
+INPUT); pinMode(2, INPUT); pinMode(3, INPUT);
 
     // =========================
     digitalWrite(RST_PIN, HIGH);
@@ -418,6 +653,7 @@ float extractValue(String g, char c, float defaultValue) {
     if (endPos == -1) endPos = g.length();
     return g.substring(pos + 1, endPos).toFloat();
 }
+*/
 
 /*
 #include <Arduino.h>
