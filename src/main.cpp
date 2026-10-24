@@ -4,11 +4,11 @@
 
 // --- PIN MAPPING (4-Wire ULN2003 Setup) --- MCU ONLY, no FPGA ---
 // X-Axis (verified live: was driving Y motor, swapped 2026-09-23)
-const int x_pins[] = {5, 6, 7, 8}; // 7, 8, 9, 10
+const int z_pins[] = {5, 6, 7, 8}; // 7, 8, 9, 10
 // Y-Axis (verified live: was driving X motor, swapped 2026-09-23)
-const int y_pins[] = {21, 22, 23, 24}; // 16, 17, 18, 6
+const int x_pins[] = {21, 22, 23, 24}; // 16, 17, 18, 6
 // Z-Axis
-const int z_pins[] = {9, 10, 11, 14}; // 11, 14, 15, 19
+const int y_pins[] = {9, 10, 11, 14}; // 11, 14, 15, 19
 
 const int STATUS_LED = 25; // Internal RP2040 LED
 
@@ -166,6 +166,27 @@ void handleLine(String line) {
     return;
   }
   if (line == "!" || line == "~" || line == "\x18") {
+    Serial.println("ok");
+    return;
+  }
+
+  // Raw axis jog for bring-up: "$JX5" / "$JY-3" / "$JZ2"
+  // Moves one motor directly, no pen lift/drop logic.
+  if (line.startsWith("$J") && line.length() > 3) {
+    char ax = line.charAt(2);
+    float v = extractValue(line, ax, 0) * unitScale;
+    digitalWrite(STATUS_LED, HIGH);
+    if (ax == 'X')
+      moveAxesUs(curX + v, curY, curZ, RAPID_US);
+    else if (ax == 'Y')
+      moveAxesUs(curX, curY + v, curZ, RAPID_US);
+    else if (ax == 'Z')
+      moveAxesUs(curX, curY, curZ + v, RAPID_US);
+    digitalWrite(STATUS_LED, LOW);
+    Serial.print("JOG ");
+    Serial.print(ax);
+    Serial.print(" ");
+    Serial.println(v, 3);
     Serial.println("ok");
     return;
   }
