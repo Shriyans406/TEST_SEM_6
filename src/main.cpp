@@ -4,9 +4,9 @@
 
 // --- PIN MAPPING (4-Wire ULN2003 Setup) --- MCU ONLY, no FPGA ---
 // X-Axis (verified live: was driving Y motor, swapped 2026-09-23)
-const int z_pins[] = {5, 6, 7, 8}; // 7, 8, 9, 10
+const int x_pins[] = {5, 6, 7, 8}; // 7, 8, 9, 10
 // Y-Axis (verified live: was driving X motor, swapped 2026-09-23)
-const int x_pins[] = {21, 22, 23, 24}; // 16, 17, 18, 6
+const int z_pins[] = {21, 22, 23, 24}; // 16, 17, 18, 6
 // Z-Axis
 const int y_pins[] = {9, 10, 11, 14}; // 11, 14, 15, 19
 
@@ -39,6 +39,9 @@ const long RAPID_US = 1800; // G0 travel speed (faster than draw feed)
 const int step_seq[8][4] = {{1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0},
                             {0, 1, 1, 0}, {0, 0, 1, 0}, {0, 0, 1, 1},
                             {0, 0, 0, 1}, {1, 0, 0, 1}};
+
+// Positive Y drove the pen down the paper on this rig; flip so +Y is up like CAD expects.
+const bool Y_INVERT = true;
 
 int x_step_idx = 0;
 int y_step_idx = 0;
@@ -81,6 +84,9 @@ void setup() {
   Serial.println("ok");
 
   pinMode(STATUS_LED, OUTPUT);
+
+  // Start at current physical position = origin; z at paper contact (no downward start move)
+  curX = 0; curY = 0; curZ = PEN_DOWN_MM;
 
   for (int i = 0; i < 4; i++) {
     pinMode(x_pins[i], OUTPUT);
@@ -507,7 +513,7 @@ void moveAxesUs(float tx, float ty, float tz, long useDelayUs) {
     errY += sY;
     if (errY >= maxSteps) {
       errY -= maxSteps;
-      stepMotor(y_pins, y_step_idx, dirY);
+      stepMotor(y_pins, y_step_idx, Y_INVERT ? !dirY : dirY);
     }
     errZ += sZ;
     if (errZ >= maxSteps) {
